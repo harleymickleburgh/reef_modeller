@@ -16,6 +16,8 @@ class CoralODELab:
         self.output = []
         self.times = []
         self.start_conditions = []
+        self.parameters = {}
+        self.num_paramers = 0
 
     # this forces you to create an ode function
     # in every class that inherits this one
@@ -41,32 +43,40 @@ class CoralODELab:
         plt.legend()
         plt.show()  
 
+    def set_parameter(self,name,value):
+        self.parameters[name] = value
+
+    def set_parameters(self,new_parameters):
+        self.parameters = parameters
+
 
 
 class Mumby(CoralODELab):
 
     def __init__(self):
         CoralODELab.__init__(self,"Mumby")
+        self.num_parameters = 5
+        self.parameters = {
+                "a": 0.1,
+                "g": 0.18976,
+                "y": 0.77,
+                "r": 0.55,
+                "d": 0.24}
     
     def ode(self, z, t):
-        a = 0.1 #overgrowth
-        g = 0.18976 #0 - 0.5; grazing
-        y = 0.77 #growth rate
-        r = 0.55 #recruitment
-        d = 0.24 #mortality
      
         T = 1 - z[0] - z[1]
          
         #coral (z(1))
-        recruitmentC = r*T*z[0]
-        mortalityC = d*z[0]
-        Movergrowth = a*z[1]*z[0]
+        recruitmentC = self.parameters['r']*T*z[0]
+        mortalityC = self.parameters['d']*z[0]
+        Movergrowth = self.parameters['a']*z[1]*z[0]
         dCdt = recruitmentC - mortalityC - Movergrowth
         
         # macroalgae (z(2))
-        MMovergrowth = a*z[1]*z[0]
-        grazing = (g*z[1]) / (z[1] + T)
-        growthM = y*z[1]*T
+        MMovergrowth = self.parameters['a']*z[1]*z[0]
+        grazing = (self.parameters['g']*z[1]) / (z[1] + T)
+        growthM = self.parameters['y']*z[1]*T
         dMdt = MMovergrowth - grazing + growthM
     
         return[dCdt, dMdt]
@@ -83,5 +93,10 @@ if __name__ == "__main__":
     coralModel.set_start_conditions(start)
     coralModel.solve_time()
     coralModel.plot_through_time()
+
+    coralModel.set_parameter("g", 0.21)
+    coralModel.solve_time()
+    coralModel.plot_through_time()
+
 
      
