@@ -10,22 +10,54 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import pyplot
 
-class ModelName:
-    def __init__(self, name):
-        self.name = name
+class CoralODELab:
+    def __init__(self, model):
+        self.model_name = model
+        self.output = []
+        self.times = []
+        self.start_conditions = []
 
-class mumby(ModelName):
+    # this forces you to create an ode function
+    # in every class that inherits this one
+    def ode(self):
+        raise Exception("Not Implemented")
+
+    def set_times(self,times):
+        self.times = times
+
+    def set_start_conditions(self, start_conditions):
+        self.start_conditions = start_conditions
+
+    def solve_time(self):
+        # run the scipy ode integrator
+        self.output = odeint(self.ode, self.start_conditions, self.times)
+
+    def plot_through_time(self):
+        # plot the results
+        plt.plot(self.times, self.output[:,0], label="Coral")
+        plt.plot(self.times, self.output[:,1], label="Algae")
+        plt.ylim(0,1)
+        plt.xlim(-1)
+        plt.legend()
+        plt.show()  
+
+
+
+class Mumby(CoralODELab):
+
+    def __init__(self):
+        CoralODELab.__init__(self,"Mumby")
     
-    def ode(z,t):
+    def ode(self, z, t):
         a = 0.1 #overgrowth
-        g = 0.5 #0 - 0.5; grazing
+        g = 0.18976 #0 - 0.5; grazing
         y = 0.77 #growth rate
         r = 0.55 #recruitment
         d = 0.24 #mortality
      
         T = 1 - z[0] - z[1]
          
-             #coral (z(1))
+        #coral (z(1))
         recruitmentC = r*T*z[0]
         mortalityC = d*z[0]
         Movergrowth = a*z[1]*z[0]
@@ -38,18 +70,18 @@ class mumby(ModelName):
         dMdt = MMovergrowth - grazing + growthM
     
         return[dCdt, dMdt]
+
+
+
        
-zstart = [0.8, 0.2]
+if __name__ == "__main__":
+    # only run if called as a script, not imported
+    start = [0.8, 0.2]
+    t = np.linspace(0,100, num = 100)
+    coralModel = Mumby()
+    coralModel.set_times(t)
+    coralModel.set_start_conditions(start)
+    coralModel.solve_time()
+    coralModel.plot_through_time()
 
-t = np.linspace(0,500, num = 500)
-
-x = odeint(mumby, zstart, t)
-C = x[:,0]
-M = x[:,1]
-
-# plot the results
-plt.plot(t, C)
-plt.plot(t, M)
-plt.ylim(0,1)
-plt.xlim(-1)
-plt.show()       
+     
