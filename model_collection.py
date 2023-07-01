@@ -18,6 +18,7 @@ class CoralODELab:
         self.start_conditions = []
         self.parameters = {}
         self.num_paramers = 0
+        self.citaiton = ""
 
     # this forces you to create an ode function
     # in every class that inherits this one
@@ -62,6 +63,7 @@ class Mumby(CoralODELab):
                 "y": 0.77,
                 "r": 0.55,
                 "d": 0.24}
+        self.citation = "Mumby, P.J., Hastings, A. and Edwards, H.J. (2007), Thresholds and the resilience of Caribbean coral reefs, Nature, Vol. 450 No. 7166, pp. 98–101."
     
     def ode(self, z, t):
      
@@ -97,6 +99,8 @@ if __name__ == "__main__":
     coralModel.set_parameter("g", 0.21)
     coralModel.solve_time()
     coralModel.plot_through_time()
+    print(coralModel.model_name)
+    print(coralModel.citation)
 
 
      
