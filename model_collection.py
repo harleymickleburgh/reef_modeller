@@ -93,7 +93,10 @@ class CoralODELab:
     # set/get. 
 
 
-
+# TODO. Move this into it's own file. 
+# do 
+# import model_collection
+# then you can keep the code and models a lot cleaner.
 class Mumby(CoralODELab):
 
     def __init__(self):
