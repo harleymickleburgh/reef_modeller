@@ -30,7 +30,7 @@ class CoralODELab:
         self.start_conditions = []
         self.parameters = {}
         self.num_paramers = 0
-        self.citaiton = ""
+        self.citation = ""
         self.parameter_names = {}
         self.parameter_range = {}
 
@@ -41,7 +41,7 @@ class CoralODELab:
 
     # this forces you to create an ode function
     # in every class that inherits this one
-    def ode(self, z, t):
+    def ode(self, z, t): # ode gets changed to whatever model is being run
         """
         Solve the ODE equation set.
 
