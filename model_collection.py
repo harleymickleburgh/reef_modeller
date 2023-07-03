@@ -10,46 +10,86 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import pyplot
 
-class ModelName:
-    def __init__(self, name):
-        self.name = name
+class CoralODELab:
+    """This is a top-level class to use as an inherit class for all other models. We use it
+    to solve ODE sets to describe the interactions of coral-algae on reefs. 
 
-class mumby(ModelName):
-    
-    def ode(z,t):
-        a = 0.1 #overgrowth
-        g = 0.5 #0 - 0.5; grazing
-        y = 0.77 #growth rate
-        r = 0.55 #recruitment
-        d = 0.24 #mortality
-     
-        T = 1 - z[0] - z[1]
-         
-             #coral (z(1))
-        recruitmentC = r*T*z[0]
-        mortalityC = d*z[0]
-        Movergrowth = a*z[1]*z[0]
-        dCdt = recruitmentC - mortalityC - Movergrowth
+    :param model_name: Name given to this mode
+    :type name: string
+    :param output: holder for the output of the solve
+    :type output: list[float]
+    """
+    # TODO finish me
+
+    def __init__(self, model):
+        """Constructor method
+        """
+        self.model_name = model
+        self.output = []
+        self.times = []
+        self.start_conditions = []
+        self.parameters = {}
+        self.num_paramers = 0
+        self.citaiton = ""
+        self.parameter_names = {}
+        self.parameter_range = {}
+
+        # internal variables
+        self._coral_colour = "#F88379"
+        self._malgae_colour = "#617D48"
+        self._talgae_colour = "#5FC87E"
+
+    # this forces you to create an ode function
+    # in every class that inherits this one
+    def ode(self, z, t):
+        """
+        Solve the ODE equation set.
+
+        Return array of the dX/dt value for each ODE. Used by scipy.odeint
+
+        :param z: List of starting conditions. One per ODE
+        :type z: list[float]
+        :raise: Exception if ODEs not implemented
+        :return: delta values
+        :rtype: list[float]
         
-        # macroalgae (z(2))
-        MMovergrowth = a*z[1]*z[0]
-        grazing = (g*z[1]) / (z[1] + T)
-        growthM = y*z[1]*T
-        dMdt = MMovergrowth - grazing + growthM
-    
-        return[dCdt, dMdt]
-       
-zstart = [0.8, 0.2]
+        """
+        
+        raise Exception("Not Implemented")
 
-t = np.linspace(0,500, num = 500)
+    def set_times(self,times):
+        self.times = times
 
-x = odeint(mumby, zstart, t)
-C = x[:,0]
-M = x[:,1]
+    def set_start_conditions(self, start_conditions):
+        self.start_conditions = start_conditions
 
-# plot the results
-plt.plot(t, C)
-plt.plot(t, M)
-plt.ylim(0,1)
-plt.xlim(-1)
-plt.show()       
+    def solve_time(self):
+        # run the scipy ode integrator
+        self.output = odeint(self.ode, self.start_conditions, self.times)
+
+    def plot_through_time(self):
+        # plot the results
+        plt.plot(self.times, self.output[:,0], label="Coral", color=self._coral_colour)
+        plt.plot(self.times, self.output[:,1], label="Algae", color=self._malgae_colour)
+        plt.ylim(0,1)
+        plt.xlim(-1)
+        plt.legend()
+        # TODO whata bout saving the image?
+        plt.show()  
+        # TODO what happens when there are three components? How could we manage that?
+
+    def set_parameter(self,name,value):
+        # add check that the name is in the paramter set
+        self.parameters[name] = value
+
+    def set_parameters(self,new_parameters):
+        # TODO Add some checks that the keys are as you expect
+        # the number of values is correct, etc
+        self.parameters = parameters
+
+    # above are "set_" methods (setters). You normal have the "get_" equivalent (getter).
+    # This means a user doesn't need to know the variable names in your class, they can call
+    # the function instead. You, as API programmer, then also get to control what can be
+    # set/get. 
+
+
