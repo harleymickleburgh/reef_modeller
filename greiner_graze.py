@@ -1,62 +1,78 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Jun 28 11:11:43 2023
+
+Created on Tue Jul  4 11:42:58 2023
 
 @author: kl909
 """
+from model_collection import *
 
-from scipy.integrate import odeint
-import numpy as np
-import matplotlib.pyplot as plt
-
-r = 0.55 # Rate coral recruits settle on turf algae (/time)
-d = 0.24
-a = 0.1
-g = 0.77 #0.01 ≤g≤ 0.99
-y = 0.77 #Rate macroalgae recruits settle on turf algae (/time)
-lbc = 0.0025 # divided elmhirst value of all coral recruitment 0.005
-lsc = 0.0025
-mlbc = 0.0025
-mlsc = 0.0025
-
-def greiner(z,t):
-
-     T = 1 - z[0] - z[1]
+class greiner(CoralODELab):
+    def __init__(self):
+        CoralODELab.__init__(self,"greiner")
+        self.num_parameters = 9
+        self.parameters = {
+            "r" : 0.55, #growth
+            "d" : 0.24,# mortality 0.02 - 1.0
+            "a" : 0.1,# coral overgrowth
+            "g" : 0.77,# grazing (use fung?)
+            "y" : 0.77, # turf overgrowth
+            "lbc" : 0.0025, # divided elmhirst value of all coral recruitment 0.005
+            "lsc" : 0.0025,
+            "mlbc" : 0.0025,
+            "mlsc" : 0.0025,
+            
+            }
+        self.parameter_names = {
+            "r" : "growth",
+            "d" : "mortality", # 0.02 - 1.0
+            "a" : "coral overgrowth",
+            "g" : "grazing (use fung?)",
+            "y" : "turf overgrowth",
+            "lbc" : "local coral recruitment",
+            "lsc" : "external coral recruitment",
+            "mlbc" : "local algae recruitment",
+            "mlsc" : "external algae recruitment",
+           
+            }
+        self.parameter_ranges = {
+            
+            }
+        self.citation = "Greiner, A., S. Darling, E., Fortin, M.-J., & Krkošek, M. (2022). The combined effects of dispersal and herbivores on stable states in coral reefs. Theoretical Ecology, 15(4), 321–335."
+        
+    def ode(self, z, t):
+        T = 1 - z[0] - z[1]
+       
+        growth = self.parameters['r']*(1-self.parameters['lbc'])*T*z[0]
+        mortalityC = self.parameters['d']*z[0]
+        Movergrowth = self.parameters['a']*z[1]*z[0]
+        recruitment = self.parameters['r']*self.parameters['lsc']*z[0]*T
+        dCdt = growth - mortalityC - Movergrowth + recruitment
+       
+       # macroalgae (z(2))
+        MMovergrowth = self.parameters['a']*z[1]*z[0]
+        grazing = self.parameters['g']*(z[1]*T)
+        growthM1 = self.parameters['y']*(1-self.parameters['mlbc'])*z[1]*T
+        growthM2 = self.parameters['y']*self.parameters['mlsc'] * z[1]*T
+        dMdt = MMovergrowth - grazing + growthM1 + growthM2
+       
+        return[dCdt, dMdt]
     
-     growth = r*(1-lbc)*T*z[0]
-     mortalityC = d*z[0]
-     Movergrowth = a*z[1]*z[0]
-     recruitment = r*lsc*z[0]*T
-     dCdt = growth - mortalityC - Movergrowth + recruitment
-    
-    # macroalgae (z(2))
-     MMovergrowth = a*z[1]*z[0]
-     grazing = g*(z[1]*T)
-     growthM1 = y*(1-mlbc)*z[1]*T
-     growthM2 = y*mlsc * z[1]*T
-     dMdt = MMovergrowth - grazing + growthM1 + growthM2
-    
-     return[dCdt, dMdt]
-     
-graz_pressure = np.arange(0.05, 1.0, 0.05) 
-Cval = []
-Mval = []
-#t = np.linspace(0,250)
-i = 0
+if __name__ == "__main__":
+    # only run if called as a script, not imported
+    start = [0.8, 0.2]
+    t = np.linspace(0,100, num = 100)
+    coralModel = greiner()
+    coralModel.set_times(t)
+    coralModel.set_start_conditions(start)
+    coralModel.solve_time()
+    coralModel.plot_through_time()
 
 
-# intial conditons
-for point in graz_pressure:
-    zstart = [0.8, 0.2]
-    t = np.linspace(0,500, num = 500)
-    g = point
-    ode = odeint(greiner, zstart, t)
-    C = ode[:,0]
-    M = ode[:,1]
-    Cval.append(C[-1])
-    Mval.append(M[-1])
-    i = + 1
+    coralModel.set_parameter("g", 0.21)
+    coralModel.solve_time()
+    coralModel.plot_through_time()
+    print(coralModel.model_name)
+    print(coralModel.citation)
 
-plt.plot(graz_pressure, Cval, graz_pressure, Mval)
-plt.show()
