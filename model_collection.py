@@ -74,6 +74,9 @@ class CoralODELab:
         plt.ylim(0,1)
         plt.xlim(-1)
         plt.legend()
+        plt.title(self.model_name)
+        plt.xlabel('Time (years)')
+        plt.ylabel('Population')
         # TODO whata bout saving the image?
         plt.show()  
         # TODO what happens when there are three components? How could we manage that?

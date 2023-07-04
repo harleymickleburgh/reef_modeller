@@ -186,10 +186,10 @@ zstart = [0.8, 0.2]
 
 
 # declare a time vector (time window)
-t = np.linspace(0,500, num = 500)
+t = np.linspace(0,100, num = 100)
 
 # call the ode
-x = odeint(greiner, zstart, t)
+x = odeint(CAm, zstart, t)
 C = x[:,0]
 M = x[:,1]
 
