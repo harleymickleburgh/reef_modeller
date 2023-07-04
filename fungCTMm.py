@@ -14,27 +14,27 @@ class fungCTMm(CoralODELab):
         self.num_parameters = 14
         self.parameters = {
             "theta" : 0.2, #grazing pressure
-            "dc" : 0.02, #coral mortality rate (yr^-1)
+            "dc" : 0.05, #coral mortality rate (yr^-1)
             "lbc" : 0.0009, #rate at which coral larvae, produced by local established brooding corals, recruit onto space (yr^-1)
-            "lsc" : 0.00006, #rate at which exogenus spawning coral larvae recruit onto space (yr^-1)
+            "lsc_sink" : 0.00006, #rate at which exogenus spawning coral larvae recruit onto space (yr^-1)
             "rc" : 0.2, # lateral growth rate of corals over space (yr^-1)
             "gT" : 10, #maximum rate at which turf algae is grazed (yr^-1)
             "ac" : 0.25, #growth rate of corals over turf, relative to the rate over space
             "ec" : 0.1, #recruitment rate of corals onto turf, relative to the rate onto space 
             "sT" : 5, #growth rate of fine turf (occupying space) (yr^-1)
             "vm" : 0.9,
-            "gm" : 3.5,
+            "gm" : 0.5,
             "rm" : 0.35,
             "bm" : 0.9,
             "ymc" : 0.1,
-            "ymt" : 0.45,
+            "ymt" : 0.9,
             
             }
         self.parameter_names = {
             "theta" : "grazing pressure",
             "dc" : "coral mortality rate (yr^-1)",
             "lbc" : "rate at which coral larvae, produced by local established brooding corals, recruit onto space (yr^-1)",
-            "lsc" : "rate at which exogenus spawning coral larvae recruit onto space (yr^-1)",
+            "lsc_sink" : "rate at which exogenus spawning coral larvae recruit onto space (yr^-1)",
             "rc" : "lateral growth rate of corals over space (yr^-1)",
             "gT" : "maximum rate at which turf algae is grazed (yr^-1)",
             "ac" : "growth rate of corals over turf, relative to the rate over space",
@@ -52,7 +52,7 @@ class fungCTMm(CoralODELab):
             "theta" : [0.4, 1], #grazing pressure
             "dc" : [0.02, 0.1], #coral mortality rate (yr^-1)
             "lbc" : [0.0009, 0.5], #rate at which coral larvae, produced by local established brooding corals, recruit onto space (yr^-1)
-            "lsc" : [0.00006, 0.01], #rate at which exogenus spawning coral larvae recruit onto space (yr^-1)
+            "lsc_sink" : [0.00006, 0.01], #rate at which exogenus spawning coral larvae recruit onto space (yr^-1)
             "rc" : [0.04, 0.2], # lateral growth rate of corals over space (yr^-1)
             "gT" : [5, 15], #maximum rate at which turf algae is grazed (yr^-1)
             "ac" : [0,1], #growth rate of corals over turf, relative to the rate over space
@@ -78,18 +78,34 @@ class fungCTMm(CoralODELab):
         dCdt = recruitmentC + growthC - mortalityC - MgrowthC
         
         #turf dT
-        growthT = sT*(1-theta)*S
-        grazingT = gT*theta*z[1]
-        CrecrtuitmentT = ec*(lsc_sink+lbc*z[0])*z[1] #coral recruitment on turf
-        CgrowthT = ac*rc*(1-bm*z[2])*z[1]*z[0] #%coral growth over turf
-        MgrowthCT = ymt*rm*z[2]*z[1]
+        growthT = self.parameters['sT']*(1-self.parameters['theta'])*S
+        grazingT = self.parameters['gT']*self.parameters['theta']*z[1]
+        CrecrtuitmentT = self.parameters['ec']*(self.parameters['lsc_sink']+self.parameters['lbc']*z[0])*z[1] #coral recruitment on turf
+        CgrowthT = self.parameters['ac']*self.parameters['rc']*(1-self.parameters['bm']*z[2])*z[1]*z[0] #%coral growth over turf
+        MgrowthCT = self.parameters['ymt']*self.parameters['rm']*z[2]*z[1]
         
         dTdt = growthT - grazingT - CrecrtuitmentT - CgrowthT - MgrowthCT
         
           #macroalgae dM
-        growthM = rm*z[2]*(S+ymc*z[0]+ymt*z[1])
-        grazingM = gm*theta*z[2]
+        growthM = self.parameters['rm']*z[2]*(S+self.parameters['ymc']*z[0]+self.parameters['ymt']*z[1])
+        grazingM = self.parameters['gm']*self.parameters['theta']*z[2]
         
         dMdt = growthM - grazingM
         
         return [dCdt, dTdt, dMdt]
+
+if __name__ == "__main__":
+    # only run if called as a script, not imported
+    start = [0.8, 0.1, 0.1]
+    t = np.linspace(0,100, num = 100)
+    coralModel = fungCTMm() #call correct model here
+    coralModel.set_times(t)
+    coralModel.set_start_conditions(start)
+    coralModel.solve_time()
+    coralModel.plot_through_time()
+
+    coralModel.set_parameter("g", 0.21)
+    coralModel.solve_time()
+    coralModel.plot_through_time()
+    print(coralModel.model_name)
+    print(coralModel.citation)            
