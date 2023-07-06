@@ -14,10 +14,25 @@ class CoralODELab:
     """This is a top-level class to use as an inherit class for all other models. We use it
     to solve ODE sets to describe the interactions of coral-algae on reefs. 
 
-    :param model_name: Name given to this mode
+    :param model_name: Name given to this model
     :type name: string
-    :param output: holder for the output of the solve
+    :param output: holder for the output of the solver
     :type output: list[float]
+    :param times: number of years model is being run for
+    :type times: list[float]
+    :param start_conditions: inital population of z(0) (coral) and z(1) (algae) adding up to 1
+    :type start_conditions: list[float]
+    :param parameters: variable names and value
+    :type parameters: dictionary[string:int]
+    :param num_parameters: total number of parameters in model
+    :type num_parameters: [int]
+    :param citation: full citation of paper model was extracted from
+    :type param: [string]
+    :param parameter_names: definition of each parameter symbol
+    :type parameter_names: dictionary[string:string]
+    :param parameter_range: values each parameter can be observed at
+    :type parameter_range: dict[string: range]
+    
     """
     # TODO finish me
 
@@ -29,7 +44,7 @@ class CoralODELab:
         self.times = []
         self.start_conditions = []
         self.parameters = {}
-        self.num_paramers = 0
+        self.num_parameters = 0
         self.citation = ""
         self.parameter_names = {}
         self.parameter_range = {}
@@ -49,6 +64,8 @@ class CoralODELab:
 
         :param z: List of starting conditions. One per ODE
         :type z: list[float]
+        :param t: list of years ODE is run for
+        :type t: list[float]
         :raise: Exception if ODEs not implemented
         :return: delta values
         :rtype: list[float]
@@ -59,13 +76,29 @@ class CoralODELab:
 
     def set_times(self,times):
         self.times = times
+        """
+        Set how many years the model will run for 
+        
+        :param times: number of years model is being run for
+        :type times: list[float]
+        
+        """
 
     def set_start_conditions(self, start_conditions):
         self.start_conditions = start_conditions
+        """
+        Set the intial population cover of z(0) and z(1). Values must add up to 1
+        
+        
+        """
 
     def solve_time(self):
         # run the scipy ode integrator
         self.output = odeint(self.ode, self.start_conditions, self.times)
+        """
+        Output of the solver, holding ode output and each time step solved.
+        
+        """
 
     def plot_through_time(self):
         # plot the results
@@ -80,10 +113,17 @@ class CoralODELab:
         # TODO whata bout saving the image?
         plt.show()  
         # TODO what happens when there are three components? How could we manage that?
+        """
+        Plotting graph for population change (y axis) and time (x axis)
+        
+        """
 
     def set_parameter(self,name,value):
         # add check that the name is in the paramter set
         self.parameters[name] = value
+        """
+        
+        """
 
     def set_parameters(self,new_parameters):
         # TODO Add some checks that the keys are as you expect
