@@ -41,6 +41,14 @@ class Mcmanus(CoralODELab):
         self.citation = "McManus, L. C., Watson, J. R., Vasconcelos, V. V., & Levin, S. A. (2019). Stability and recovery of coral-algae systems: the importance of recruitment seasonality and grazing influence. Theoretical Ecology, 12(1), 61–72."
         
     def ode(self, z, t):
+        """
+        setting up equations for Mcmanus et al. 2019.
+        ..math::
+            turf: F = 1 - z[0] - z[1] 
+            coral: \frac{dC}{dt} = \underbrace{rTC}_{growth} - \underbrace{dC}_{mortality} - \underbrace{\alpha M C}_{M \, overgrows \, C} + \underbrace{(f \delta C + w(t)) T}_{recruitment}
+            macroalgae:  \frac{dM}{dt} = \underbrace{\alpha M C}_{M \, overgrows \, C} - \underbrace{g(C)M}_{grazing} + \underbrace{\gamma M T}_{M \, overgrows \, T}
+
+        """
         F = 1 - z[0] - z[1]
         
         growth = (self.parameters['r']*F) * z[0]
