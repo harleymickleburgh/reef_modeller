@@ -67,6 +67,22 @@ class fungCTMm(CoralODELab):
         self.citation = "Fung, T., Seymour, R. M., & Johnson, C. R. (2011). Alternative stable states and phase shifts in coral reefs under anthropogenic stress. Ecology, 92(4), 967–982."
         
     def ode(self, z, t):
+        """
+        Setting up equations for Fung et al. 2011
+        ..math::
+            space: S = 1 - z[0] - z[1] - z[2]
+            
+            coral: \frac{dC}{dt} = &\underbrace{(l^s_c + l^b_c C)(S+\varepsilon_c T)} _{Recruitment}   
+    + \underbrace{r_c(1-\beta_MM)(S+\alpha_c T)C}_{Growth} 
+    - \underbrace{d_c C}_{mortality} \nonumber\\
+   & - \underbrace{\gamma _{MC} r_m MC)}_{Macroalgae \, overgrowth}
+    
+            macroalgae: \frac{dM}{dt} = \underbrace{r_M M(S+\gamma_{MC} C+ {\gamma_{MT}} T)}_{Macroalgal \, growth} - \underbrace{g_M \theta M}_{Grazing \, on \, \\ macroalgae} 
+            
+            turf: \frac{dT}{dt} = &\underbrace{\zeta_T(1-\theta)S}_{Turf\, algal \,growth} - \underbrace{g_T\theta T}_{grazing \,on \,turf} - \underbrace{\varepsilon_C(l^s_c + l^b_c C)T}_{coral \,recruitment\, on \,turf} \nonumber\\
+&- \underbrace{\alpha_c r_C (1-\beta_M M)TC}_{coral \,growth \,over \,turf} - \underbrace{\gamma_{MT} r_M MT)}_{macroalgal \, growth \, over \, turf}
+
+        """
         S = 1 - z[0] - z[1] - z[2]
         
             #coral dC

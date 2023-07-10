@@ -42,6 +42,19 @@ class greiner(CoralODELab):
         self.citation = "Greiner, A., S. Darling, E., Fortin, M.-J., & Krkošek, M. (2022). The combined effects of dispersal and herbivores on stable states in coral reefs. Theoretical Ecology, 15(4), 321–335."
         
     def ode(self, z, t):
+        """
+        Setting up equations for Greiner 2023
+        ..math:: 
+            
+            turf: T = 1 - z[0] - z[1]
+            
+            coral: \frac{dC_1}{dt} = &\underbrace{r(1-q_c) T_1 C_1}_{growth} - \underbrace{dC_1}_{mortality} - \underbrace{\alpha M_1 C_1}_{M \, overgrows \, C} \nonumber\\
+                &+ \underbrace{rp_c C_2 T_1}_{recruitment \, from \, C_1 \, and \, C_2}
+        
+            macroalgae: \frac{dM_1}{dt} = \underbrace{\alpha M_1 C_1}_{M \, overgrows \, C} - \underbrace{g(MT)}_{grazing} + \underbrace{\gamma(1 - q_m)M_1 T_1}_{M_1 \, overgrows \, T_1} + \underbrace{\gamma p_m M_2 T_1}_{M_2 \, overgrows \, T_1}
+            
+        """
+        
         T = 1 - z[0] - z[1]
        
         growth = self.parameters['r']*(1-self.parameters['lbc'])*T*z[0]

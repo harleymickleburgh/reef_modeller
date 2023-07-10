@@ -19,6 +19,11 @@ y = 0.77 # M overgrowing T
 e = 0.005 # algae recruitment
 
 def elmhirst(z,t):
+    """
+    Setting up equations for Elmhirst et al. 
+
+
+    """
     T = 1 - z[0] - z[1]
     
     growth = z[0]*(r*T)
