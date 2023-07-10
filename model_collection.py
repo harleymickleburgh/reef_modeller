@@ -75,7 +75,6 @@ class CoralODELab:
         raise Exception("Not Implemented")
 
     def set_times(self,times):
-        self.times = times
         """
         Set how many years the model will run for 
         
@@ -84,23 +83,35 @@ class CoralODELab:
         
         """
 
+        self.times = times
+
+
     def set_start_conditions(self, start_conditions):
-        self.start_conditions = start_conditions
         """
         Set the intial population cover of z(0) and z(1). Values must add up to 1
         
+        :param start_conditions: list of values for the start of the model. 1 per equation
+        :type start_conditions: list[float]
         
         """
+        self.start_conditions = start_conditions
 
     def solve_time(self):
-        # run the scipy ode integrator
-        self.output = odeint(self.ode, self.start_conditions, self.times)
         """
-        Output of the solver, holding ode output and each time step solved.
+        Solves the ODE over the times specified by the user. Stores output in self.output
+
+        :return: nothing
         
         """
+        # run the scipy ode integrator
+        self.output = odeint(self.ode, self.start_conditions, self.times)
+
 
     def plot_through_time(self):
+        """
+        Plotting graph for population change (y axis) and time (x axis)
+        
+        """
         # plot the results
         plt.plot(self.times, self.output[:,0], label="Coral", color=self._coral_colour)
         plt.plot(self.times, self.output[:,1], label="Algae", color=self._malgae_colour)
@@ -113,19 +124,29 @@ class CoralODELab:
         # TODO whata bout saving the image?
         plt.show()  
         # TODO what happens when there are three components? How could we manage that?
-        """
-        Plotting graph for population change (y axis) and time (x axis)
-        
-        """
 
     def set_parameter(self,name,value):
+        """
+        Set a single parameter by name
+
+        :param name: name of the parameter to set
+        :type name: string
+        :param value: value of the parameter to set
+        :type value: float
+
+
+        """
         # add check that the name is in the paramter set
         self.parameters[name] = value
-        """
-        
-        """
 
     def set_parameters(self,new_parameters):
+        """
+        Set all parameters via a dictionary
+
+        :param new_parameters: set of parameter values
+        :type new_parameters: dictionary of names/value pairs
+        """
+
         # TODO Add some checks that the keys are as you expect
         # the number of values is correct, etc
         self.parameters = parameters
