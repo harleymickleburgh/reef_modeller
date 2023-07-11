@@ -54,6 +54,31 @@ class CoralODELab:
         self._malgae_colour = "#617D48"
         self._talgae_colour = "#5FC87E"
 
+    def _check_value(self,number):
+
+        if (type(number) == list):
+            for l in number:
+                if (not (type(l) == float or type(l) == int)):
+                    raise self.IncorrectValueException
+                if l < 0:
+                    raise self.IncorrectValueException
+        elif (not (type(number) == float or type(number) == int)):
+            if number < 0:
+                raise self.IncorrectValueException
+        else:
+            raise self.IncorrectValueException
+
+
+
+    def _check_length(self, my_list, expected_length, exact=False):
+
+        if (not exact and len(my_list)<expected_length):
+            raise self.IncorrectLengthException
+        if (exact and not (len(my_list) == expected_length)):
+            raise self.IncorrectLengthException
+
+        return
+
     # this forces you to create an ode function
     # in every class that inherits this one
     def ode(self, z, t): # ode gets changed to whatever model is being run
@@ -82,42 +107,31 @@ class CoralODELab:
         :type times: list[float]
         
         """
+
+        self._check_length(times,2)
+        self._check_value(times)
+        if (not sorted(times) == times):
+            raise Exception("Times should be in ascending order")
+
         self.times = times
-        
-        if not given two numbers, fail "must enter two integers or floats"
-        
-     #   for x in times: #if not integers or floats, fail
-     #       if type(times) not in [int, float]:
-     #           raise ValueError("The times input must be an integer or a float")
-            
-     #   if times < 0:# if numbers are negative, fail
-     #       raise ValueError("The minimum time must be positive")
-        
-     #   if numbers aren't in ascending order, fail
-        
-     
+          
 
     def set_start_conditions(self, start_conditions):
         """
-        Set the intial population cover of z(0) and z(1). Values must add up to 1
+        S et the intial population cover of z(0) and z(1). Values must add up to 1
         
         :param start_conditions: list of values for the start of the model. 1 per equation
         :type start_conditions: list[float]
         
         """
+
+        self._check_length(start_conditions,2,exact=True)
+        self._check_value(start_conditions)
+        
+        if (sum(start_conditions) > 1):
+            raise Exception("Sum of starting conditions should be between 0 and 1")
+
         self.start_conditions = start_conditions
-        
-      #  if not given two numbers, fail ("Must give one start condition for coral and one start condition for algae")
-        
-       # if not integers or floats, fail ("Input must be integers or floats")
-            
-            
-      #  if times < 0:# if numbers are negative, fail
-            raise ValueError("The input times must be positive")
-        
-      #  if numbers arent in ascending order, fail ("Input must be in ascending order")
-        
-      #  if numbers dont add up to 1, fail ("start conditions must add up to 1")
             
             
 
@@ -131,13 +145,17 @@ class CoralODELab:
         # run the scipy ode integrator
         self.output = odeint(self.ode, self.start_conditions, self.times)
 
-        not sure what this function does again --> dont think the user does anything here?
+        #not sure what this function does again --> dont think the user does anything here?
 
     def plot_through_time(self):
         """
         Plotting graph for population change (y axis) and time (x axis)
-        
+         
         """
+
+        if (len(self.output) < 1):
+            return
+
         # plot the results
         plt.plot(self.times, self.output[:,0], label="Coral", color=self._coral_colour)
         plt.plot(self.times, self.output[:,1], label="Algae", color=self._malgae_colour)
@@ -163,19 +181,16 @@ class CoralODELab:
 
         """
         # add check that the name is in the paramter set
+        try:
+            self.parameters[name]
+        except KeyError:
+            raise Exception("Parameter name is not in the options list. See docs")
+
+        self._check_value(value)
+
         self.parameters[name] = value
-        
-      #  if not given name of parameter, fail ("Please give name of parameter"):
-        
-       # if not given value of parameter, fail ("Please give value of parameter"):
-        
-       # if given more than one parameter, fail ("Please only enter one parameter to change"):
-        
-        #if key is not string, fail ("dictionary key must be string"):
-        
-      #  if value is not int or float, fail ("dictionary value must be integer or float"):
-            
-     #   if value not within range, fail (not set up ranges for all though) ("value is outside range")
+    
+        #TODO if value not within range, fail (not set up ranges for all though) ("value is outside range")
 
     def set_parameters(self,new_parameters):
         """
@@ -185,18 +200,16 @@ class CoralODELab:
         :type new_parameters: dictionary of names/value pairs
         """
 
-        # TODO Add some checks that the keys are as you expect
-        # the number of values is correct, etc
-        self.parameters = parameters
+        values = new_parameters.values()
+        self._check_length(values,self.num_parameters,exact=True)
+        self._check_values(values)
+        keys = new_parameters.keys()
+        expected_keys = self.parameters.keys()
+        if (not (sorted(new_parameters.keys()) == sorted(self.parameters.keys()))):
+            raise Exception("Parameters names do not match the options list. See docs")
 
-        
-        #if given wrong number of parameters, fail ("Please give correct number of parameters for model"):
-        
-       # if given wrong number of values, fail ("Please give correct number of parameter values for model")
-        
-        #if key is not string, fail ("dictionary key must be string"):
-        
-       # if value is not int or float, fail ("dictionary value must be integer or float"):
+        self.parameters = parameters
+ 
             
        # if value not within range, fail (not set up ranges for all though) ("value is outside range"):
             

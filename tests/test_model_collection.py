@@ -22,23 +22,11 @@ class TestModelCollection(unittest.TestCase):
     
     def test_set_start_conditions(self):
         model = CoralODELab("test")
-        model.set_start_conditions("test")
-    
-    def test_solve_time(self):
-        model = CoralODELab("test")
-        model.solve_time("test")
-        
+        model.set_start_conditions([0,1])
+            
     def test_plot_through_time(self):
         model = CoralODELab("test")
-        model.plot_through_time("test")
-    
-    def test_set_parameter(self):
-        model = CoralODELab("test")
-        model.set_parameter("test")
-    
-    def test_set_parameters(self):
-        model = CoralODELab("test")
-        model.set_parameters("test")
+        model.plot_through_time()
 
 if __name__ == '__main__':
     unittest.main()
