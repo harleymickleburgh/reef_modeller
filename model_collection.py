@@ -76,15 +76,26 @@ class CoralODELab:
 
     def set_times(self,times):
         """
-        Set how many years the model will run for 
+        Set how many years the model will run for, enter first and last year, e.g (0,10) for 10 years
         
         :param times: number of years model is being run for
         :type times: list[float]
         
         """
-
         self.times = times
-
+        
+        if not given two numbers, fail "must enter two integers or floats"
+        
+     #   for x in times: #if not integers or floats, fail
+     #       if type(times) not in [int, float]:
+     #           raise ValueError("The times input must be an integer or a float")
+            
+     #   if times < 0:# if numbers are negative, fail
+     #       raise ValueError("The minimum time must be positive")
+        
+     #   if numbers aren't in ascending order, fail
+        
+     
 
     def set_start_conditions(self, start_conditions):
         """
@@ -95,6 +106,20 @@ class CoralODELab:
         
         """
         self.start_conditions = start_conditions
+        
+      #  if not given two numbers, fail ("Must give one start condition for coral and one start condition for algae")
+        
+       # if not integers or floats, fail ("Input must be integers or floats")
+            
+            
+      #  if times < 0:# if numbers are negative, fail
+            raise ValueError("The input times must be positive")
+        
+      #  if numbers arent in ascending order, fail ("Input must be in ascending order")
+        
+      #  if numbers dont add up to 1, fail ("start conditions must add up to 1")
+            
+            
 
     def solve_time(self):
         """
@@ -106,6 +131,7 @@ class CoralODELab:
         # run the scipy ode integrator
         self.output = odeint(self.ode, self.start_conditions, self.times)
 
+        not sure what this function does again --> dont think the user does anything here?
 
     def plot_through_time(self):
         """
@@ -138,6 +164,18 @@ class CoralODELab:
         """
         # add check that the name is in the paramter set
         self.parameters[name] = value
+        
+      #  if not given name of parameter, fail ("Please give name of parameter"):
+        
+       # if not given value of parameter, fail ("Please give value of parameter"):
+        
+       # if given more than one parameter, fail ("Please only enter one parameter to change"):
+        
+        #if key is not string, fail ("dictionary key must be string"):
+        
+      #  if value is not int or float, fail ("dictionary value must be integer or float"):
+            
+     #   if value not within range, fail (not set up ranges for all though) ("value is outside range")
 
     def set_parameters(self,new_parameters):
         """
@@ -151,6 +189,17 @@ class CoralODELab:
         # the number of values is correct, etc
         self.parameters = parameters
 
+        
+        #if given wrong number of parameters, fail ("Please give correct number of parameters for model"):
+        
+       # if given wrong number of values, fail ("Please give correct number of parameter values for model")
+        
+        #if key is not string, fail ("dictionary key must be string"):
+        
+       # if value is not int or float, fail ("dictionary value must be integer or float"):
+            
+       # if value not within range, fail (not set up ranges for all though) ("value is outside range"):
+            
     # above are "set_" methods (setters). You normal have the "get_" equivalent (getter).
     # This means a user doesn't need to know the variable names in your class, they can call
     # the function instead. You, as API programmer, then also get to control what can be
