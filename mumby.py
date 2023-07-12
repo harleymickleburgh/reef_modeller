@@ -30,16 +30,16 @@ class Mumby(CoralODELab):
         self.citation = "Mumby, P.J., Hastings, A. and Edwards, H.J. (2007), Thresholds and the resilience of Caribbean coral reefs, Nature, Vol. 450 No. 7166, pp. 98–101."
     
     def ode(self, z, t):
-     r"""
-     Setting up the equations from Mumby et al. 2007 for turf, coral and macroalgae
-     ..math::
-     Turf = T
-     Coral: \frac{dC}{dt} = \underbrace{rTC}_{recruitment \, growth} - \underbrace{dC}_{mortality} - \underbrace{\alpha MC}_{overgrowth\, by \,M}
-     
-     Macroalgae: \frac{dM}{dt} = \underbrace{\alpha MC}_{M \, overgrows \, C} - \underbrace{\frac{gM}{M+T}}_{grazed \, M \, becomes \, T} + \underbrace{\gamma MT}_{M \, spreads \, over \, T}
-
-
-        """
+        r"""
+        Setting up the equations from Mumby et al. 2007 for turf, coral and macroalgae
+        ..math::
+        Turf = T
+        Coral: \frac{dC}{dt} = \underbrace{rTC}_{recruitment \, growth} - \underbrace{dC}_{mortality} - \underbrace{\alpha MC}_{overgrowth\, by \,M}
+        
+        Macroalgae: \frac{dM}{dt} = \underbrace{\alpha MC}_{M \, overgrows \, C} - \underbrace{\frac{gM}{M+T}}_{grazed \, M \, becomes \, T} + \underbrace{\gamma MT}_{M \, spreads \, over \, T}
+       
+       
+           """
         T = 1 - z[0] - z[1]
          
         #coral (z(1))

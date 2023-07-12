@@ -59,23 +59,23 @@ class CoralODELab:
         if (type(number) == list):
             for l in number:
                 if (not (type(l) == float or type(l) == int)):
-                    raise self.IncorrectValueException
+                    raise Exception("Value entered in list is not an integer or float")
                 if l < 0:
-                    raise self.IncorrectValueException
+                    raise Exception("Value entered in list is negative, please insert positive number")
         elif (not (type(number) == float or type(number) == int)):
-            if number < 0:
-                raise self.IncorrectValueException
+            if number.all() < 0:
+                raise Exception("Value entered is negative, please insert positive number") # jon check
         else:
-            raise self.IncorrectValueException
+            raise Exception("Value entered is not an integer or float") # jon check
 
 
 
     def _check_length(self, my_list, expected_length, exact=False):
 
         if (not exact and len(my_list)<expected_length):
-            raise self.IncorrectLengthException
+            raise Exception("Entered wrong number of parameters") # jon check
         if (exact and not (len(my_list) == expected_length)):
-            raise self.IncorrectLengthException
+            raise Exception("Enetered incorrect parameter") # jon check
 
         return
 
@@ -110,7 +110,7 @@ class CoralODELab:
 
         self._check_length(times,2)
         self._check_value(times)
-        if (not sorted(times) == times):
+        if (not sorted(times.all())) == times:
             raise Exception("Times should be in ascending order")
 
         self.times = times
