@@ -62,11 +62,12 @@ class CoralODELab:
                     raise Exception("Value entered in list is not an integer or float")
                 if l < 0:
                     raise Exception("Value entered in list is negative, please insert positive number")
-        elif (not (type(number) == float or type(number) == int)):
-            if number.all() < 0:
-                raise Exception("Value entered is negative, please insert positive number") # jon check
+        elif (type(number) == float or type(number) == int):
+            print(type(number))
+            if number < 0:
+                raise Exception("Value entered is negative, please insert positive number") 
         else:
-            raise Exception("Value entered is not an integer or float") # jon check
+            raise Exception("Value entered is not an integer or float") 
 
 
 
@@ -75,7 +76,7 @@ class CoralODELab:
         if (not exact and len(my_list)<expected_length):
             raise Exception("Entered wrong number of parameters") # jon check
         if (exact and not (len(my_list) == expected_length)):
-            raise Exception("Enetered incorrect parameter") # jon check
+            raise Exception("Entered wrong number of parameters") # jon check
 
         return
 
@@ -110,7 +111,7 @@ class CoralODELab:
 
         self._check_length(times,2)
         self._check_value(times)
-        if (not sorted(times.all())) == times:
+        if (not sorted(times) == times):
             raise Exception("Times should be in ascending order")
 
         self.times = times
@@ -168,6 +169,8 @@ class CoralODELab:
         # TODO whata bout saving the image?
         plt.show()  
         # TODO what happens when there are three components? How could we manage that?
+        
+        print(self.output[:,0], self.output[:,1])
 
     def set_parameter(self,name,value):
         """
@@ -201,14 +204,15 @@ class CoralODELab:
         """
 
         values = new_parameters.values()
+        print(values)
         self._check_length(values,self.num_parameters,exact=True)
-        self._check_values(values)
+        self._check_value(list(values))
         keys = new_parameters.keys()
         expected_keys = self.parameters.keys()
         if (not (sorted(new_parameters.keys()) == sorted(self.parameters.keys()))):
             raise Exception("Parameters names do not match the options list. See docs")
 
-        self.parameters = parameters
+        self.parameters = new_parameters
  
             
        # if value not within range, fail (not set up ranges for all though) ("value is outside range"):
