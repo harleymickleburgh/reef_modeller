@@ -39,11 +39,15 @@ class TestModelCollection(unittest.TestCase):
     def test_set_parameters(self):
         coralModel=greiner()
         params = {
-                "a": 0.1,
-                "g": 0.8,
-                "y": 0.77,
-                "r": 0.55,
-                "d": 0.24
+                "r" : 0.55, #growth
+                "d" : 0.24,# mortality 0.02 - 1.0
+                "a" : 0.1,# coral overgrowth
+                "g" : 0.77,# grazing (use fung?)
+                "y" : 0.77, # turf overgrowth
+                "lbc" : 0.0025, # divided elmhirst value of all coral recruitment 0.005
+                "lsc" : 0.0025,
+                "mlbc" : 0.0025,
+                "mlsc" : 0.0025,
                 }
         coralModel.set_parameters(params)
         params["a"]= "banana"
@@ -97,11 +101,15 @@ class TestModelCollection(unittest.TestCase):
         start = [0.5636363, 0.00001]
         t = [0,1]
         parameters = {
-                "a": 0.1,
-                "g": 0.1,
-                "y": 0.1,
-                "r": 0.229,
-                "d": 0.1
+            "r" : 0.229, #growth
+            "d" : 0.1,# mortality 0.02 - 1.0
+            "a" : 0.1,# coral overgrowth
+            "g" : 0.1,# grazing (use fung?)
+            "y" : 0.1, # turf overgrowth
+            "lbc" : 0.0025, # divided elmhirst value of all coral recruitment 0.005
+            "lsc" : 0.0025,
+            "mlbc" : 0.0025,
+            "mlsc" : 0.0025,
                 }
         coralModel = greiner()
         coralModel.set_times(t)
