@@ -99,14 +99,15 @@ class TestModelCollection(unittest.TestCase):
         coralModel.set_times(t)
         coralModel.set_parameters(parameters)
         coralModel.set_start_conditions(start)
-        coralModel.solve_time()
-        output = coralModel.get_output()
-        print(output)
+        test_output = coralModel.ode(start,t[1])
+        #coralModel.solve_time()
+        #output = coralModel.get_output()
+        #print(output)
         # worked out 
-        expectedC = start[0] - 4.28378806180052E-05
-        expectedM = start[1] - 1.29167633246533E-06
-        self.assertAlmostEqual(output[-1,0],expectedC,places=4)
-        self.assertAlmostEqual(output[-1,1],expectedM,places=4)
+        expected_dC = -4.28378806180052E-05
+        expected_dM = -1.29167633246533E-06
+        self.assertAlmostEqual(test_output[0],expected_dC)
+        self.assertAlmostEqual(test_output[1],expected_dM)
         
 
 if __name__ == '__main__':
