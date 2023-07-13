@@ -100,9 +100,6 @@ class TestModelCollection(unittest.TestCase):
         coralModel.set_parameters(parameters)
         coralModel.set_start_conditions(start)
         test_output = coralModel.ode(start,t[1])
-        #coralModel.solve_time()
-        #output = coralModel.get_output()
-        #print(output)
         # worked out 
         expected_dC = -4.28378806180052E-05
         expected_dM = -1.29167633246533E-06
