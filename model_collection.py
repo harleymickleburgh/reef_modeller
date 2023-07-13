@@ -216,6 +216,9 @@ class CoralODELab:
  
             
        # if value not within range, fail (not set up ranges for all though) ("value is outside range"):
+
+    def get_output(self):
+        return self.output
             
     # above are "set_" methods (setters). You normal have the "get_" equivalent (getter).
     # This means a user doesn't need to know the variable names in your class, they can call

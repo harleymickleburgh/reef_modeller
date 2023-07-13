@@ -27,7 +27,7 @@ class TestModelCollection(unittest.TestCase):
         coralModel.set_parameter("g", 0.21)
         with self.assertRaises(Exception):
             coralModel.set_parameter("g", -0.21)
-    
+
     def test_set_parameters(self):
         coralModel=Mumby()
         params = {
@@ -76,10 +76,37 @@ class TestModelCollection(unittest.TestCase):
         t = np.linspace(100,10, num = 100)
         with self.assertRaises(Exception):
             coralModel.set_times(t.tolist())
-        t = np.linspace("apple", 10, num = 100) # this one errors, because of np?
+        #t = np.linspace("apple", 10, num = 100) # this one errors, because of np?
+        # yes = linspace can't go from "apple" to 10
+        t = ["apple", "banana", "orange"]
         with self.assertRaises(Exception):
             coralModel.set_times(t.tolist())
-        
+
+    def test_solve_time(self):
+        # set up the mumby equations such that the dc/dt and dm/dt are small
+        # and the solver (which alters it's internal timestep) and a calculation
+        # by hand are roughly the same to 4 DP
+        start = [0.5636363, 0.00001]
+        t = [0,1]
+        parameters = {
+                "a": 0.1,
+                "g": 0.1,
+                "y": 0.1,
+                "r": 0.229,
+                "d": 0.1
+                }
+        coralModel = Mumby()
+        coralModel.set_times(t)
+        coralModel.set_parameters(parameters)
+        coralModel.set_start_conditions(start)
+        coralModel.solve_time()
+        output = coralModel.get_output()
+        print(output)
+        # worked out 
+        expectedC = start[0] - 4.28378806180052E-05
+        expectedM = start[1] - 1.29167633246533E-06
+        self.assertAlmostEqual(output[-1,0],expectedC,places=4)
+        self.assertAlmostEqual(output[-1,1],expectedM,places=4)
         
 
 if __name__ == '__main__':
