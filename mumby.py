@@ -62,10 +62,7 @@ if __name__ == "__main__":
     # only run if called as a script, not imported
     start = [0.5636363, 1.26518367e-08]
     t = np.linspace(0,1, num = 2)
-    
-    print(t)
     coralModel = Mumby()
-    print(coralModel.parameters)
     coralModel.set_times(t.tolist())
     coralModel.set_start_conditions(start)
     coralModel.solve_time()

@@ -42,7 +42,7 @@ class greiner(CoralODELab):
         self.citation = "Greiner, A., S. Darling, E., Fortin, M.-J., & Krkošek, M. (2022). The combined effects of dispersal and herbivores on stable states in coral reefs. Theoretical Ecology, 15(4), 321–335."
         
     def ode(self, z, t):
-        """
+        r"""
         Setting up equations for Greiner 2023
         ..math:: 
             
@@ -53,7 +53,7 @@ class greiner(CoralODELab):
         
             macroalgae: \frac{dM_1}{dt} = \underbrace{\alpha M_1 C_1}_{M \, overgrows \, C} - \underbrace{g(MT)}_{grazing} + \underbrace{\gamma(1 - q_m)M_1 T_1}_{M_1 \, overgrows \, T_1} + \underbrace{\gamma p_m M_2 T_1}_{M_2 \, overgrows \, T_1}
             
-        """
+            """
         
         T = 1 - z[0] - z[1]
        
@@ -75,9 +75,9 @@ class greiner(CoralODELab):
 if __name__ == "__main__":
     # only run if called as a script, not imported
     start = [0.8, 0.2]
-    t = np.linspace(0,100, num = 100)
+    t = np.linspace(0,1, num = 2)
     coralModel = greiner()
-    coralModel.set_times(t)
+    coralModel.set_times(t.tolist())
     coralModel.set_start_conditions(start)
     coralModel.solve_time()
     coralModel.plot_through_time()
