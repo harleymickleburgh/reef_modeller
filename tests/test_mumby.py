@@ -82,10 +82,9 @@ class TestModelCollection(unittest.TestCase):
         with self.assertRaises(Exception):
             coralModel.set_times(t.tolist())
 
-    def test_solve_time(self):
-        # set up the mumby equations such that the dc/dt and dm/dt are small
-        # and the solver (which alters it's internal timestep) and a calculation
-        # by hand are roughly the same to 4 DP
+    def test_ode(self):
+        # set up the mumby equations and check the ode function
+        # gives same answer as a "by-hand" calculation from the paper equations
         start = [0.5636363, 0.00001]
         t = [0,1]
         parameters = {
@@ -105,6 +104,32 @@ class TestModelCollection(unittest.TestCase):
         expected_dM = -1.29167633246533E-06
         self.assertAlmostEqual(test_output[0],expected_dC)
         self.assertAlmostEqual(test_output[1],expected_dM)
+
+
+    def test_solve_time(self):
+        # test the equations solver to a known steady steate taken from the paper
+        # run for a long time (500 years!) to make sure we get there.
+        parameters = {
+                "a": 0.1,
+                "g": 0.5,
+                "y": 0.77,
+                "r": 0.55,
+                "d": 0.24
+                }
+        start = [0.1, 0.6]
+        t = [0,500]
+        coralModel = Mumby()
+        coralModel.set_times(t)
+        coralModel.set_parameters(parameters)
+        coralModel.set_start_conditions(start)
+        coralModel.solve_time()
+        test_output = coralModel.get_output()
+        expected = [0.56363635, 0.00000001]
+        self.assertAlmostEqual(test_output[-1,0],expected[0])
+        self.assertAlmostEqual(test_output[-1,1],expected[1])
+
+
+
         
 
 if __name__ == '__main__':
