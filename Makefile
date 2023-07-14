@@ -1,3 +1,5 @@
+#!/bin/sh
+
 test:
 	@echo ">>> Running tests..."
 	cd tests && make && cd ..
@@ -15,3 +17,9 @@ lint:
 	@python3 -m flake8 *.py
 	@echo "    Linting CoralODElab test suite"
 	cd test && python3 -m flake8 test && cd ..
+
+doc:
+	@echo ">>> Building the documentation..."
+	cd doc && make html && cd ..
+	@echo "Done!"
+

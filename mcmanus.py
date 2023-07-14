@@ -38,10 +38,10 @@ class Mcmanus(CoralODELab):
         self.parameter_ranges = {
             
             }
-        self.citation = "McManus, L. C., Watson, J. R., Vasconcelos, V. V., & Levin, S. A. (2019). Stability and recovery of coral-algae systems: the importance of recruitment seasonality and grazing influence. Theoretical Ecology, 12(1), 61–72."
+        self.citation = "McManus, L. C., Watson, J. R., Vasconcelos, V. V., & Levin, S. A. (2019). Stability and recovery of coral-algae systems: the importance of recruitment seasonality and grazing influence. Theoretical Ecology, 12(1), 61-72."
         
     def ode(self, z, t):
-        """
+        r"""
         setting up equations for Mcmanus et al. 2019.
         ..math::
             turf: F = 1 - z[0] - z[1] 

@@ -39,9 +39,9 @@ class elmhirst(CoralODELab):
         self.citation = "Elmhirst, T., Connolly, S. R., & Hughes, T. P. (2009). Connectivity, regime shifts and the resilience of coral reefs. Coral Reefs , 28(4), 949–957."
         
     def ode(self, z, t):
-        """
+        r"""
         setting up equations for Elmhirst et al. 2009
-        ..math::
+        .. math::
             turf: T = 1 - z[0] - z[1]
             coral: \frac{dC}{dt} = g(M,C) = \underbrace{C(rT)}_{growth} - \underbrace{dC}_{mortality} - \underbrace{\alpha MC}_{overgrowth \, by \, M} + \underbrace{\zeta T}_{recruitment}
             macroalgae: \frac{dM}{dt} = f(M,C) = \underbrace{\alpha MC}_{M \, overgrowing \, C} + \underbrace{M(\frac{g}{C-1}}_{grazing} + \underbrace{\gamma T)}_{M \, overgrows \, T} + \underbrace{\epsilon T}_{recruitment}

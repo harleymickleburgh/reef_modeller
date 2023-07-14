@@ -67,7 +67,7 @@ class fungCTMm(CoralODELab):
         self.citation = "Fung, T., Seymour, R. M., & Johnson, C. R. (2011). Alternative stable states and phase shifts in coral reefs under anthropogenic stress. Ecology, 92(4), 967–982."
         
     def ode(self, z, t):
-        """
+        r"""
         Setting up equations for Fung et al. 2011
         ..math::
             space: S = 1 - z[0] - z[1] - z[2]
