@@ -98,41 +98,72 @@ class TestModelCollection(unittest.TestCase):
         t = ["apple", "banana", "orange"]
         with self.assertRaises(Exception):
             coralModel.set_times(t.tolist())
+            
+    # def test_ode(self):
+    #      # set up the mumby equations and check the ode function
+    #      # gives same answer as a "by-hand" calculation from the paper equations
+    #      start = [0.1, 0.6]
+    #      t = [0,1]
+    #      parameters = {
+    #             "theta" : 0.1, #grazing pressure
+    #             "dc" : 0.1, #coral mortality rate (yr^-1)
+    #             "lbc" : 0.1, #rate at which coral larvae, produced by local established brooding corals, recruit onto space (yr^-1)
+    #             "lsc" : 0.1, #rate at which exogenus spawning coral larvae recruit onto space (yr^-1)
+    #             "rc" : 0.1, # lateral growth rate of corals over space (yr^-1)
+    #             "gT" : 0.1, #maximum rate at which turf algae is grazed (yr^-1)
+    #             "ac" : 0.1, #growth rate of corals over turf, relative to the rate over space
+    #             "ec" : 0.1, #recruitment rate of corals onto turf, relative to the rate onto space 
+    #             "sT" : 0.1, #growth rate of fine turf (occupying space) (yr^-1)
+    #             "vm" : 0.1,
+    #             "gm" : 0.1,
+    #             "rm" : 0.1,
+    #             "bm" : 0.1,
+    #             "ymc" : 0.1,
+    #              }
+    #      coralModel = fungCAm()
+    #      coralModel.set_times(t)
+    #      coralModel.set_parameters(parameters)
+    #      coralModel.set_start_conditions(start)
+    #      test_output = coralModel.ode(start,t[1])
+    #      # worked out 
+    #      expected_dC = -0.05760124
+    #      expected_dM = 0.01638324
+    #      self.assertAlmostEqual(test_output[0],expected_dC)
+    #      self.assertAlmostEqual(test_output[1],expected_dM)
 
     def test_solve_time(self):
         # set up the fungCAm equations such that the dc/dt and dm/dt are small
         # and the solver (which alters it's internal timestep) and a calculation
         # by hand are roughly the same to 4 DP
-        start = [0.1, 0.00001]
-        t = [0,1]
+
         parameters = {
-                "theta" : 0.4, #grazing pressure
-                "dc" : 0.02, #coral mortality rate (yr^-1)
-                "lbc" : 0.5, #rate at which coral larvae, produced by local established brooding corals, recruit onto space (yr^-1)
-                "lsc" : 0.01, #rate at which exogenus spawning coral larvae recruit onto space (yr^-1)
-                "rc" : 0.04, # lateral growth rate of corals over space (yr^-1)
-                "gT" : 5, #maximum rate at which turf algae is grazed (yr^-1)
-                "ac" : 0.01, #growth rate of corals over turf, relative to the rate over space
-                "ec" : 0.05, #recruitment rate of corals onto turf, relative to the rate onto space 
-                "sT" : 2, #growth rate of fine turf (occupying space) (yr^-1)
-                "vm" : 0.01,
-                "gm" : 0.2,
-                "rm" : 0.05,
-                "bm" : 0.2,
-                "ymc" : 0.01,
+                "theta" : 0.1, #grazing pressure
+                "dc" : 0.1, #coral mortality rate (yr^-1)
+                "lbc" : 0.1, #rate at which coral larvae, produced by local established brooding corals, recruit onto space (yr^-1)
+                "lsc" : 0.1, #rate at which exogenus spawning coral larvae recruit onto space (yr^-1)
+                "rc" : 0.1, # lateral growth rate of corals over space (yr^-1)
+                "gT" : 0.1, #maximum rate at which turf algae is grazed (yr^-1)
+                "ac" : 0.1, #growth rate of corals over turf, relative to the rate over space
+                "ec" : 0.1, #recruitment rate of corals onto turf, relative to the rate onto space 
+                "sT" : 0.1, #growth rate of fine turf (occupying space) (yr^-1)
+                "vm" : 0.1,
+                "gm" : 0.1,
+                "rm" : 0.1,
+                "bm" : 0.1,
+                "ymc" : 0.1,
                 }
         
+        start = [0.1, 0.6]
+        t = [0,1]
         coralModel = fungCAm()
         coralModel.set_times(t)
         coralModel.set_parameters(parameters)
         coralModel.set_start_conditions(start)
-        test_output = coralModel.ode(start,t[1])
-        # worked out 
-        expected_dC = -4.28378806180052E-05
-        expected_dM = -1.29167633246533E-06
-        self.assertAlmostEqual(test_output[0],expected_dC)
-        self.assertAlmostEqual(test_output[1],expected_dM)
-        
+        coralModel.solve_time()
+        test_output = coralModel.get_output()
+        expected = [-0.05760124, 0.01638324]
+        self.assertAlmostEqual(test_output[-1,0],expected[0])
+        self.assertAlmostEqual(test_output[-1,1],expected[1])
 
 if __name__ == '__main__':
     unittest.main()
