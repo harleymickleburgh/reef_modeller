@@ -170,7 +170,7 @@ class CoralODELab:
         plt.show()  
         # TODO what happens when there are three components? How could we manage that?
         
-        print(self.output[:,0], self.output[:,1])
+       # print(self.output[:,0], self.output[:,1])
 
     def set_parameter(self,name,value):
         """

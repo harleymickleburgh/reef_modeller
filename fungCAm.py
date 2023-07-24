@@ -13,7 +13,7 @@ class fungCAm(CoralODELab):
         CoralODELab.__init__(self,"fungCAm")
         self.num_parameters = 14
         self.parameters = {
-            "theta" : 0.2, #grazing pressure
+            "theta" : 0.7, #grazing pressure
             "dc" : 0.02, #coral mortality rate (yr^-1)
             "lbc" : 0.0009, #rate at which coral larvae, produced by local established brooding corals, recruit onto space (yr^-1)
             "lsc" : 0.00006, #rate at which exogenus spawning coral larvae recruit onto space (yr^-1)
@@ -90,12 +90,12 @@ if __name__ == "__main__":
     start = [0.8, 0.2]
     t = np.linspace(0,100, num = 100)
     coralModel = fungCAm() #call correct model here
-    coralModel.set_times(t)
+    coralModel.set_times(t.tolist())
     coralModel.set_start_conditions(start)
     coralModel.solve_time()
     coralModel.plot_through_time()
 
-    coralModel.set_parameter("g", 0.21)
+    coralModel.set_parameter("theta", 0.21)
     coralModel.solve_time()
     coralModel.plot_through_time()
     print(coralModel.model_name)
