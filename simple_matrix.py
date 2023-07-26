@@ -15,7 +15,16 @@ n_years = 10
 #create coral objects 
 corals = []
 
-#names = ["Bob", "Fred"]
+# prep lsc calculations
+p_m = 1 #how to calculate this or find the number?
+r_area = 4.08 #cm^2 area of settled recruit (fung appendix B)
+
+Pl = z[0] * p_m * r_area * c_matrix # which bit of the matrix? also is C z[0] or the corals matrix?
+N = Pl * dc
+
+
+
+#names = ["Bob", "Fred"] # this will be for a dictionary holding the names of the reefs and their coral cover later on 
 
 for n in range(0,num_sites):
     corals.append(greiner.greiner())
@@ -33,10 +42,12 @@ for c in corals:
     c.set_start_conditions([0.1,0.1])
 
 for year in range(0,n_years):
-     #c.set_parameter("lsc", 0.6)
+     #set up calculation for lsc from other reefs
+     lsc_new = (N * a) / T
      print(year)
      for c in corals:
-         c.set_parameter("lsc", 0.6)
+         #update lsc from above calculation
+         c.set_parameter("lsc", lsc_new)
          c.set_times([year,year+1])
          c.solve_time()
          print(c.output[1,:])
