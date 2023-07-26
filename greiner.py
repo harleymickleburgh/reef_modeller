@@ -56,7 +56,7 @@ class greiner(CoralODELab):
             """
         
         T = 1 - z[0] - z[1]
-       #coral (z(0))
+       #coral z[0]
         growth = self.parameters['r']*(1-self.parameters['lbc'])*T*z[0]
         mortalityC = self.parameters['d']*z[0]
         Movergrowth = self.parameters['a']*z[1]*z[0]
