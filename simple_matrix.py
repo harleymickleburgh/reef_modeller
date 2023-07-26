@@ -15,13 +15,6 @@ n_years = 10
 #create coral objects 
 corals = []
 
-# prep lsc calculations
-p_m = 1 #how to calculate this or find the number?
-r_area = 4.08 #cm^2 area of settled recruit (fung appendix B)
-
-Pl = z[0] * p_m * r_area * c_matrix # which bit of the matrix? also is C z[0] or the corals matrix?
-N = Pl * dc
-
 
 
 #names = ["Bob", "Fred"] # this will be for a dictionary holding the names of the reefs and their coral cover later on 
@@ -36,6 +29,13 @@ print(corals)
 #c_matrix = np.zeros((num_sites,num_sites))
 c_matrix = np.identity(2)
 print(c_matrix)
+
+# prep lsc calculations
+p_m = 1 #how to calculate this or find the number?
+r_area = 4.08 #cm^2 area of settled recruit (fung appendix B)
+
+Pl = corals * p_m * r_area * c_matrix # which bit of the matrix? also is C z[0] or the corals matrix?
+N = Pl * greiner.d # don't know how to import the parameter
 
 # set up starting conditions
 for c in corals:
