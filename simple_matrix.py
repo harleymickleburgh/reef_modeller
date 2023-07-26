@@ -10,7 +10,7 @@ import greiner
 import numpy as np
 
 num_sites = 2
-n_years = 10
+n_years = 1
 
 #create coral objects 
 corals = []
@@ -26,8 +26,8 @@ print(corals)
 
 
 #set up matrix
-#c_matrix = np.zeros((num_sites,num_sites))
-c_matrix = np.identity(2)
+c_matrix = [[1,2],[3,4]]
+#c_matrix = np.identity(2)
 #print(c_matrix)
 
 # prep lsc calculations
@@ -47,23 +47,27 @@ for c in corals:
 
 for year in range(0,n_years):
      lsc_new = []
-     for sink in range(0,num_sites):
+     for sink in range(0,num_sites): # how are these connected to the matrix?
         Pl = 0
         for source in range(0,num_sites):
-            Pl = Pl + (lastC[source] * p_m * r_area * c_matrix[source,sink]) # which bit of the matrix? also is C z[0] or the corals matrix?
-        N = Pl * corals[sink].parameters("d") # don't know how to import the parameter
-        #set up calculation for lsc from other reefs
-        lsc_new.append((N * r_area) / T)
-     print(year)
-     for c in range(0,num_sites):
-         #update lsc from above calculation
-         corals[c].set_parameter("lsc", lsc_new[c])
-         corals[c].set_times([year,year+1])
-         corals[c].solve_time()
-         print(corals[c].output[1,:])
-         corals[c].set_start_conditions(corals[c].output[1,:].tolist())
-         lastC[c] = corals[c].output[1,0]
-         lastM[c] = corals[c].output[1,1]
+            print(c_matrix[source])
+           # print(c_matrix[sink])
+     #        Pl = Pl + (lastC[source] * p_m * r_area * c_matrix[source,sink]) # which bit of the matrix? also is C z[0] or the corals matrix?
+     #    N = Pl * corals[sink].parameters["d"]
+     #    #set up calculation for lsc from other reefs
+     #    T = 1 - lastC[sink] - lastM[sink]
+     #    lsc_new.append((N * r_area) / T)
+     # print(year)
+     # for c in range(0,num_sites):
+     #     #update lsc from above calculation
+         
+     #     corals[c].set_parameter("lsc", float(lsc_new[c]))
+     #     corals[c].set_times([year,year+1])
+     #     corals[c].solve_time()
+     #     print(corals[c].output[1,:])
+     #     corals[c].set_start_conditions(corals[c].output[1,:].tolist())
+     #     lastC[c] = corals[c].output[1,0]
+     #     lastM[c] = corals[c].output[1,1]
 
  #    R1.set_parameter("lsc", c_matrix[0,0])
  #    ode()
