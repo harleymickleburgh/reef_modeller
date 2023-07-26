@@ -32,7 +32,7 @@ c_matrix = np.identity(2)
 
 # prep lsc calculations
 p_m = 1 #how to calculate this or find the number?
-r_area = 4.08 #cm^2 area of settled recruit (fung appendix B)
+r_area = 4.08/10000. #cm^2 area of settled recruit (fung appendix B)
 
 
 lastC = []
