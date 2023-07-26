@@ -31,7 +31,7 @@ c_matrix = np.identity(2)
 #print(c_matrix)
 
 # prep lsc calculations
-p_m = 1 #how to calculate this or find the number?
+p_m = 1 
 r_area = 4.08/10000. #cm^2 area of settled recruit (fung appendix B)
 
 
@@ -53,7 +53,7 @@ for year in range(0,n_years):
             Pl = Pl + (lastC[source] * p_m * r_area * c_matrix[source,sink]) # which bit of the matrix? also is C z[0] or the corals matrix?
         N = Pl * corals[sink].parameters("d") # don't know how to import the parameter
         #set up calculation for lsc from other reefs
-        lsc_new.append((N * a) / T)
+        lsc_new.append((N * r_area) / T)
      print(year)
      for c in range(0,num_sites):
          #update lsc from above calculation

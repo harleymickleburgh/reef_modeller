@@ -81,6 +81,7 @@ if __name__ == "__main__":
     coralModel.set_start_conditions(start)
     coralModel.solve_time()
     coralModel.plot_through_time()
+    
 
 
     coralModel.set_parameter("g", 0.21)
