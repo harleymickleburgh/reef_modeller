@@ -63,7 +63,7 @@ class CoralODELab:
                 if l < 0:
                     raise Exception("Value entered in list is negative, please insert positive number")
         elif (type(number) == float or type(number) == int):
-            print(type(number))
+            #print(type(number))
             if number < 0:
                 raise Exception("Value entered is negative, please insert positive number") 
         else:
@@ -204,7 +204,7 @@ class CoralODELab:
         """
 
         values = new_parameters.values()
-        print(values)
+        #print(values)
         self._check_length(values,self.num_parameters,exact=True)
         self._check_value(list(values))
         keys = new_parameters.keys()

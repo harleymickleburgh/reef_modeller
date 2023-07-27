@@ -60,14 +60,14 @@ class greiner(CoralODELab):
         growth = self.parameters['r']*(1-self.parameters['lbc'])*T*z[0]
         mortalityC = self.parameters['d']*z[0]
         Movergrowth = self.parameters['a']*z[1]*z[0]
-        recruitment = self.parameters['r']*self.parameters['lsc']*z[0]*T
+        recruitment = self.parameters['r']*self.parameters['lsc']*T
         dCdt = growth - mortalityC - Movergrowth + recruitment
        
        # macroalgae (z(1))
         MMovergrowth = self.parameters['a']*z[1]*z[0]
         grazing = self.parameters['g']*(z[1]*T)
         growthM1 = self.parameters['y']*(1-self.parameters['mlbc'])*z[1]*T
-        growthM2 = self.parameters['y']*self.parameters['mlsc'] * z[1]*T
+        growthM2 = self.parameters['y']*self.parameters['mlsc'] *T
         dMdt = MMovergrowth - grazing + growthM1 + growthM2
        
         return[dCdt, dMdt]

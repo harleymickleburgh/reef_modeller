@@ -14,21 +14,20 @@ n_years = 1
 
 #create coral objects 
 corals = []
-
+print(corals)
 
 
 #names = ["Bob", "Fred"] # this will be for a dictionary holding the names of the reefs and their coral cover later on 
 
 for n in range(0,num_sites):
-    corals.append(greiner.greiner())
-    
-print(corals)
+    corals.append(greiner.greiner()) #what did this do?
+   
 
 
 #set up matrix
 c_matrix = np.loadtxt("matrix_practice.csv",
                       delimiter=",", dtype=float)
-display(c_matrix)
+#display(c_matrix)
 np.shape(c_matrix)
 #c_matrix = [[1,2,3],[4,5,6],[7,8,9]]
 #c_matrix = np.identity(2)
@@ -54,13 +53,14 @@ for year in range(0,n_years):
      for sink in range(0,num_sites): 
         Pl = 0
         for source in range(0,num_sites):
-            print(c_matrix[source])
+            #print(c_matrix[source])
             #begin calculating lsc
             Pl = Pl + (lastC[source] * p_m * r_area * c_matrix[sink][source]) 
         N = Pl * corals[sink].parameters["d"]
         T = 1 - lastC[sink] - lastM[sink]
         lsc_new.append((N * r_area) / T)
-     print(year)
+     #print(year)
+     print(range(num_sites))
      for c in range(0,num_sites):
           #update lsc from above calculation
           corals[c].set_parameter("lsc", float(lsc_new[c]))
@@ -70,8 +70,8 @@ for year in range(0,n_years):
           corals[c].set_start_conditions(corals[c].output[1,:].tolist())
           lastC[c] = corals[c].output[1,0]
           lastM[c] = corals[c].output[1,1]
-          print(lastC)
-          print(lastM)
+          #print(lastC)
+         # print(lastM)
 
     # R1.set_parameter("lsc", c_matrix[0,0])
     # ode()
