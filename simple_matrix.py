@@ -38,7 +38,7 @@ np.shape(c_matrix)
 p_m = 1 
 r_area = 4.08/10000. #cm^2 area of settled recruit (fung appendix B)
 
-
+# lists to hold final outputs for coral and macroalgae
 lastC = []
 lastM = []
 
@@ -50,28 +50,28 @@ for c in corals:
 
 
 for year in range(0,n_years):
-     lsc_new = []
-     for sink in range(0,num_sites): # how are these connected to the matrix?
+     lsc_new = [] # list to hold updated lsc value
+     for sink in range(0,num_sites): 
         Pl = 0
         for source in range(0,num_sites):
             print(c_matrix[source])
-           
-            Pl = Pl + (lastC[source] * p_m * r_area * c_matrix[sink][source]) # which bit of the matrix? also is C z[0] or the corals matrix?
+            #begin calculating lsc
+            Pl = Pl + (lastC[source] * p_m * r_area * c_matrix[sink][source]) 
         N = Pl * corals[sink].parameters["d"]
-         #set up calculation for lsc from other reefs
         T = 1 - lastC[sink] - lastM[sink]
         lsc_new.append((N * r_area) / T)
      print(year)
      for c in range(0,num_sites):
           #update lsc from above calculation
-         
           corals[c].set_parameter("lsc", float(lsc_new[c]))
           corals[c].set_times([year,year+1])
-          corals[c].solve_time()
-          print(corals[c].output[1,:])
+          corals[c].solve_time() #ode solver
+          #print(corals[c].output[1,:])
           corals[c].set_start_conditions(corals[c].output[1,:].tolist())
           lastC[c] = corals[c].output[1,0]
           lastM[c] = corals[c].output[1,1]
+          print(lastC)
+          print(lastM)
 
     # R1.set_parameter("lsc", c_matrix[0,0])
     # ode()
