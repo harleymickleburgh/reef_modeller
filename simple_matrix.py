@@ -26,7 +26,11 @@ print(corals)
 
 
 #set up matrix
-c_matrix = [[1,2,3],[4,5,6],[7,8,9]]
+c_matrix = np.loadtxt("matrix_practice.csv",
+                      delimiter=",", dtype=float)
+display(c_matrix)
+np.shape(c_matrix)
+#c_matrix = [[1,2,3],[4,5,6],[7,8,9]]
 #c_matrix = np.identity(2)
 #print(c_matrix)
 
