@@ -9,7 +9,7 @@ Created on Tue Jul 25 14:15:34 2023
 import greiner
 import numpy as np
 
-num_sites = 2
+num_sites = 3
 n_years = 1
 
 #create coral objects 
@@ -26,7 +26,7 @@ print(corals)
 
 
 #set up matrix
-c_matrix = [[1,2],[3,4]]
+c_matrix = [[1,2,3],[4,5,6],[7,8,9]]
 #c_matrix = np.identity(2)
 #print(c_matrix)
 
@@ -51,25 +51,25 @@ for year in range(0,n_years):
         Pl = 0
         for source in range(0,num_sites):
             print(c_matrix[source])
-           # print(c_matrix[sink])
-     #        Pl = Pl + (lastC[source] * p_m * r_area * c_matrix[source,sink]) # which bit of the matrix? also is C z[0] or the corals matrix?
-     #    N = Pl * corals[sink].parameters["d"]
-     #    #set up calculation for lsc from other reefs
-     #    T = 1 - lastC[sink] - lastM[sink]
-     #    lsc_new.append((N * r_area) / T)
-     # print(year)
-     # for c in range(0,num_sites):
-     #     #update lsc from above calculation
+           
+            Pl = Pl + (lastC[source] * p_m * r_area * c_matrix[sink][source]) # which bit of the matrix? also is C z[0] or the corals matrix?
+        N = Pl * corals[sink].parameters["d"]
+         #set up calculation for lsc from other reefs
+        T = 1 - lastC[sink] - lastM[sink]
+        lsc_new.append((N * r_area) / T)
+     print(year)
+     for c in range(0,num_sites):
+          #update lsc from above calculation
          
-     #     corals[c].set_parameter("lsc", float(lsc_new[c]))
-     #     corals[c].set_times([year,year+1])
-     #     corals[c].solve_time()
-     #     print(corals[c].output[1,:])
-     #     corals[c].set_start_conditions(corals[c].output[1,:].tolist())
-     #     lastC[c] = corals[c].output[1,0]
-     #     lastM[c] = corals[c].output[1,1]
+          corals[c].set_parameter("lsc", float(lsc_new[c]))
+          corals[c].set_times([year,year+1])
+          corals[c].solve_time()
+          print(corals[c].output[1,:])
+          corals[c].set_start_conditions(corals[c].output[1,:].tolist())
+          lastC[c] = corals[c].output[1,0]
+          lastM[c] = corals[c].output[1,1]
 
- #    R1.set_parameter("lsc", c_matrix[0,0])
- #    ode()
- #    R1.solve_time(i, i+1)
+    # R1.set_parameter("lsc", c_matrix[0,0])
+    # ode()
+    # R1.solve_time(i, i+1)
     
