@@ -10,18 +10,19 @@ import greiner
 import numpy as np
 
 num_years = 5
+num_sites = 2
 
 reefs = {}
-reefs["reef_1"] = [0.8, 0.2]
-reefs["reef_2"] = [0.8, 0.2]
+reefs["reef_1"] = [0.8, 0.1]
+reefs["reef_2"] = [0.8, 0.1]
 
 
 start = []
 for value in reefs.values():
     start = [value]
-    start.append(start)
-    #print(start[0])
-    #value.set_start_conditions((start[0]))
+    start.append(start[0])
+    
+print(start)
 
 
 for year in range(0, num_years):
@@ -29,21 +30,35 @@ for year in range(0, num_years):
     mlsc_new = []
     for key in reefs.items():
         if key == "reef_1":
-            lsc = reefs["reef_2"][0]
+            lsc = reefs.parameters["lsc"] * reefs["reef_2"][0]
             lsc_new.append(lsc)
-            mlsc = reefs["reef_2"][1]
+            mlsc = reefs.parameters["mlsc"] * reefs["reef_2"][1]
             mlsc_new.append(mlsc)
+            start = (start[0])
+            reefs[key].set_parameter("lsc", lsc_new[key])
+            reefs[key].set_parameter("mlsc", float(mlsc_new[key]))
         if key == "reef_2":
-            lsc = reefs["reef_1"][0]
+            lsc = reefs.parameters["lsc"] * reefs["reef_1"][0]
             lsc_new.append(lsc)
-            mlsc = reefs["reef_1"][1]
+            mlsc = reefs.parameters["mlsc"] * reefs["reef_1"][1]
             mlsc_new.append(mlsc)
-        reefs[key].set_parameter("lsc", float(lsc_new[key]))
-        reefs[key].set_parameter("mlsc", float(mlsc_new[key]))
-        reefs[key].set_times([year,year+1])
-        reefs[key].solve_time() #ode solver
+            start = (start[1])
+            reefs[key].set_parameter("lsc", lsc_new[key])
+            reefs[key].set_parameter("mlsc", float(mlsc_new[key]))
+            
+            
+    for c in range(0,num_sites):    ### help
+        reefs[c].set_times([year,year+1])
+        reefs[c].solve_time() #ode solver
         #print(corals[c].output[1,:])
-        reefs[key].set_start_conditions(reefs[key].output[1,:].tolist())
+        reefs[c].set_start_conditions(start)
+                                      
+                                      
+        reefs[c].set_start_conditions(reefs[c].output[1,:].tolist()) # this needs changing???
+        
+        # add new populations to dictionary 
+        for value in reefs.values():
+            value.append(output)
             
             
             
