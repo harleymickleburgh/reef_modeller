@@ -48,6 +48,8 @@ class CoralODELab:
         self.citation = ""
         self.parameter_names = {}
         self.parameter_range = {}
+        self.coral_cover = 0
+        self.macroalgae_cover = 0
 
         # internal variables
         self._coral_colour = "#F88379"
@@ -133,8 +135,8 @@ class CoralODELab:
             raise Exception("Sum of starting conditions should be between 0 and 1")
 
         self.start_conditions = start_conditions
-            
-            
+        self.coral_cover = start_conditions[0]
+        self.macroalgae_cover = start_conditions[1]
 
     def solve_time(self):
         """
@@ -145,6 +147,13 @@ class CoralODELab:
         """
         # run the scipy ode integrator
         self.output = odeint(self.ode, self.start_conditions, self.times)
+
+        self.coral_cover = self.output[-1][0]
+        self.macroalgae_cover = self.output[-1][1]
+
+
+        # TODO: add last output to the two cover variables
+        # TODO: make tests to check this
 
         #not sure what this function does again --> dont think the user does anything here?
 
