@@ -9,22 +9,62 @@ Created on Thu Jul 27 15:29:01 2023
 import greiner
 import numpy as np
 
+num_years = 5
 
-reef1 = 0
-reef2 = 0
-
-start = [0.8, 0.2]
-
-
-
-# reef1.set_start_conditions([0.1,0.1])
-# reef2.set_start_conditions([0.1,0.1])
+reefs = {}
+reefs["reef_1"] = [0.8, 0.2]
+reefs["reef_2"] = [0.8, 0.2]
 
 
-num_years = 10
+start = []
+for value in reefs.values():
+    start = [value]
+    start.append(start)
+    #print(start[0])
+    #value.set_start_conditions((start[0]))
 
-for y in num_years:
-     coralModel.set_start_conditions(start)
+
+for year in range(0, num_years):
+    lsc_new = []
+    mlsc_new = []
+    for key in reefs.items():
+        if key == "reef_1":
+            lsc = reefs["reef_2"][0]
+            lsc_new.append(lsc)
+            mlsc = reefs["reef_2"][1]
+            mlsc_new.append(mlsc)
+        if key == "reef_2":
+            lsc = reefs["reef_1"][0]
+            lsc_new.append(lsc)
+            mlsc = reefs["reef_1"][1]
+            mlsc_new.append(mlsc)
+        reefs[key].set_parameter("lsc", float(lsc_new[key]))
+        reefs[key].set_parameter("mlsc", float(mlsc_new[key]))
+        reefs[key].set_times([year,year+1])
+        reefs[key].solve_time() #ode solver
+        #print(corals[c].output[1,:])
+        reefs[key].set_start_conditions(reefs[key].output[1,:].tolist())
+            
+            
+            
+            
+ #    if reef value = reef 1, lsc = reef 2 value [0]
+ #        and mlsc = reef 2 value [1]
+ #     else
+ #         lsc = reef 1 value [0]
+ # and mlsc = reef 1 value [1]
+ 
+ #     update the population in reefs for each reef
+ #     = new start condition
+     
+     
+    
+
+#start conditions is a list 
+
+
+#for y in num_years:
+#     coralModel.set_start_conditions(start)
     
     
     
