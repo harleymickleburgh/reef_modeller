@@ -75,18 +75,19 @@ class greiner(CoralODELab):
 if __name__ == "__main__":
     # only run if called as a script, not imported
     start = [0.8, 0.2]
-    t = np.linspace(0,1, num = 2)
+    t = np.linspace(0,5000, num = 2)
     coralModel = greiner()
     coralModel.set_times(t.tolist())
     coralModel.set_start_conditions(start)
     coralModel.solve_time()
     coralModel.plot_through_time()
+    coralModel.show()
     
 
 
-    coralModel.set_parameter("g", 0.21)
-    coralModel.solve_time()
-    coralModel.plot_through_time()
-    print(coralModel.model_name)
-    print(coralModel.citation)
+    # coralModel.set_parameter("g", 0.21)
+    # coralModel.solve_time()
+    # coralModel.plot_through_time()
+    # print(coralModel.model_name)
+    # print(coralModel.citation)
 
