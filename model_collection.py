@@ -147,7 +147,11 @@ class CoralODELab:
         """
         # run the scipy ode integrator
         self.output = odeint(self.ode, self.start_conditions, self.times)
+        
 
+# set a limit of outputs to be between 0 and 1
+        self.output = np.clip(self.output, 0, 1)
+            
         self.coral_cover = self.output[-1][0]
         self.macroalgae_cover = self.output[-1][1]
 
