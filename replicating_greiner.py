@@ -9,13 +9,13 @@ Created on Thu Jul 27 15:29:01 2023
 import greiner
 import numpy as np
 
-num_years = 500
+num_years = 50
 
 reefs = {}
 site_1 = greiner.greiner()
 site_2 = greiner.greiner()
-site_1.set_parameter("g",0.8)
-site_2.set_parameter("g",0.8)
+site_1.set_parameter("g",0.29)
+site_2.set_parameter("g",0.29)
 site_1.set_parameter("lsc",0.0)
 site_2.set_parameter("lsc",0.0)
 site_1.set_parameter("mlsc",0.0)
@@ -30,8 +30,8 @@ site_1.set_start_conditions([0.0, 0.8])
 site_2.set_start_conditions([0.0, 0.8])
 
 times.append(0)
-coral.append([0.0,0.8])
-macro.append([0.0,0.8])
+coral.append([0.0,0.0])
+macro.append([0.8,0.8])
 
 for year in range(0, num_years):
      site_1.set_parameter("lsc", pc * site_2.coral_cover)
