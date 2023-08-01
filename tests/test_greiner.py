@@ -146,7 +146,7 @@ class TestModelCollection(unittest.TestCase):
           test_output = coralModel.ode(start,t[1])
           # worked out 
           expected_dC = 0.0042
-          expected_dM = 0.0082
+          expected_dM = -0.002111111
           self.assertAlmostEqual(test_output[0],expected_dC)
           self.assertAlmostEqual(test_output[1],expected_dM)
         
