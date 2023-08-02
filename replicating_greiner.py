@@ -26,14 +26,14 @@ site_2.set_parameter("mlsc",0.06)
 times = []
 coral = []
 macro = []
-pc = pm = qm = qc = 0.00
+pc = pm = qm = qc = 0.06
 
-site_1.set_start_conditions([0.31794001, 0.31794001])
-site_2.set_start_conditions([0.31794001, 0.31794001])
+site_1.set_start_conditions([0.08, 0.48])
+site_2.set_start_conditions([0.45, 0.08])
 
 times.append(0)
-coral.append([0.31794001, 0.31794001])
-macro.append([0.31794001, 0.31794001])
+coral.append([site_1.coral_cover, site_2.coral_cover])
+macro.append([site_1.macroalgae_cover, site_2.macroalgae_cover])
 
 for year in range(0, num_years):
      site_1.set_parameter("lsc", pc * site_2.coral_cover)
