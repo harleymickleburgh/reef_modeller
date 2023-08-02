@@ -28,12 +28,12 @@ coral = []
 macro = []
 pc = pm = qm = qc = 0.00
 
-site_1.set_start_conditions([0.8, 0.1])
-site_2.set_start_conditions([0.1, 0.8])
+site_1.set_start_conditions([0.31794001, 0.31794001])
+site_2.set_start_conditions([0.31794001, 0.31794001])
 
 times.append(0)
-coral.append([0.8,0.1])
-macro.append([0.1,0.8])
+coral.append([0.31794001, 0.31794001])
+macro.append([0.31794001, 0.31794001])
 
 for year in range(0, num_years):
      site_1.set_parameter("lsc", pc * site_2.coral_cover)
@@ -56,6 +56,7 @@ for year in range(0, num_years):
 
 print(times[-1], coral[-1], macro[-1])
 
+# separate out reef 1 and 2 coral and macroalgae
 reef1coral= []
 reef1macro= []
 reef2coral= []
@@ -71,12 +72,12 @@ for value in macro:
 #plot graph 
 plt.plot(times, reef1coral, label="Reef 1 Coral", color="#F88379")
 plt.plot(times, reef1macro, label="Reef 1 Algae", color="#617D48")
-# plt.plot(times, coral[1], label="Reef 2 Coral")
-# plt.plot(times, macro[1], label="Reef 2 Algae")
+plt.plot(times, reef2coral, '--', label="Reef 2 Coral", color="#F88379")
+plt.plot(times, reef2macro, '--', label="Reef 2 Algae", color="#617D48")
 plt.ylim(0,1)
 plt.xlim(-1)
 plt.legend()
-plt.title("Replicating Greiner")
+plt.title("Replicating Greiner (dispersal 0.06)")
 plt.xlabel('Time (years)')
 plt.ylabel('Population')
 # TODO whata bout saving the image?
