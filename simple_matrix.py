@@ -8,13 +8,14 @@ Created on Tue Jul 25 14:15:34 2023
 
 import greiner
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
 num_sites = 3
-n_years = 1
+n_years = 5
 
 #create coral objects 
 corals = []
-print(corals)
 
 
 #names = ["Bob", "Fred"] # this will be for a dictionary holding the names of the reefs and their coral cover later on 
@@ -40,16 +41,21 @@ r_area = 4.08/10000. #cm^2 area of settled recruit (fung appendix B)
 # lists to hold final outputs for coral and macroalgae
 lastC = []
 lastM = []
+times = []
+times.append(0)
+
 
 # set up starting conditions
 for c in corals:
     c.set_start_conditions([0.1,0.1])
     lastC.append(0.1)
     lastM.append(0.1)
+    
 
 
 for year in range(0,n_years):
      lsc_new = [] # list to hold updated lsc value
+     times.append(year+1)
      for sink in range(0,num_sites): 
         Pl = 0
         for source in range(0,num_sites):
@@ -60,20 +66,32 @@ for year in range(0,n_years):
         T = 1 - lastC[sink] - lastM[sink]
         lsc_new.append((N * r_area) / T)
      #print(year)
-     print(range(num_sites))
+     #print(range(num_sites))
+     
+     #now solve ode using new lsc
+     
      for c in range(0,num_sites):
           #update lsc from above calculation
-          corals[c].set_parameter("lsc", float(lsc_new[c]))
+          corals[c].set_parameter("lsc", float(lsc_new[c])) # set lsc in regard to the other reefs
           corals[c].set_times([year,year+1])
           corals[c].solve_time() #ode solver
           #print(corals[c].output[1,:])
           corals[c].set_start_conditions(corals[c].output[1,:].tolist())
           lastC[c] = corals[c].output[1,0]
           lastM[c] = corals[c].output[1,1]
-          #print(lastC)
-         # print(lastM)
+    # print(lastC)
+     #print(lastM)
+     reefs = {'Year':[year],
+            'Site':[c],
+            'Coral': [lastC[-1]],
+            'Macro': [lastM[-1]]}
+     reefs = pd.DataFrame(reefs)
+     print(reefs)
 
-    # R1.set_parameter("lsc", c_matrix[0,0])
-    # ode()
-    # R1.solve_time(i, i+1)
+     
+
+     
+     
+
+
     
