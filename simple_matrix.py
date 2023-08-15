@@ -111,7 +111,10 @@ colours = ['#377eb8', '#ff7f00', '#4daf4a',
 # loop over sites, plot the coral and macro lines for each site, looping over colours
 for c in range(0,2):
     ax.plot(times, corals[c][:], label="Reef "+str(c)+" Coral", color=colours[c])
-    ax.plot(times, corals[c][:], label="Reef "+str(c)+" Macro", linestyle="--", color=colours[c])
+
+
+    ax.plot(times, macros[c][:], label="Reef "+str(c)+" Macro", linestyle="--", color=colours[c])
+
  
 
 
