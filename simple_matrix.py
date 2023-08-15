@@ -81,12 +81,12 @@ for year in range(0,n_years):
           lastM[c] = corals[c].output[1,1]
     # print(lastC)
      #print(lastM)
-     reefs = {'Year':[year],
-            'Site':[c],
-            'Coral': [lastC[-1]],
-            'Macro': [lastM[-1]]}
-     reefs = pd.DataFrame(reefs)
-     print(reefs)
+          reefs = {'Year':[year],
+                 'Site':[c],
+                 'Coral': [lastC[-1]],
+                 'Macro': [lastM[-1]]}
+          reefs = pd.DataFrame(reefs)
+          print(reefs)
 
      
 
