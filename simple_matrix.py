@@ -65,6 +65,9 @@ for year in range(0,n_years):
         N = Pl * corals[sink].parameters["d"]
         T = 1 - lastC[sink] - lastM[sink]
         lsc_new.append((N * r_area) / T)
+        
+
+
      #print(year)
      #print(range(num_sites))
      
@@ -81,12 +84,15 @@ for year in range(0,n_years):
           lastM[c] = corals[c].output[1,1]
     # print(lastC)
      #print(lastM)
-          reefs = {'Year':[year],
-                 'Site':[c],
-                 'Coral': [lastC[-1]],
-                 'Macro': [lastM[-1]]}
-          reefs = pd.DataFrame(reefs)
+          
+          
+          reefs_tab = {'Year':[year],
+                  'Site':[c],
+                  'Coral': [lastC[-1]],
+                  'Macro': [lastM[-1]]}
+          reefs = pd.DataFrame.from_dict(reefs_tab)
           print(reefs)
+          
 
      
 
