@@ -50,7 +50,9 @@ for c in corals:
     c.set_start_conditions([0.1,0.1])
     lastC.append(0.1)
     lastM.append(0.1)
-    
+
+# set up the dataframe here
+reefs = pd.DataFrame(columns = ['Year', 'Sites', 'Coral', 'Macro'])    
 
 
 for year in range(0,n_years):
@@ -84,15 +86,16 @@ for year in range(0,n_years):
           lastM[c] = corals[c].output[1,1]
     # print(lastC)
      #print(lastM)
-          
-          
-          reefs_tab = {'Year':[year],
-                  'Site':[c],
-                  'Coral': [lastC[-1]],
-                  'Macro': [lastM[-1]]}
-          reefs = pd.DataFrame.from_dict(reefs_tab)
-          print(reefs)
-          
+          temp_reef = pd.DataFrame.from_dict({'Year': [year], "Sites": [c], "Coral": [lastC[c]], "Macro": [lastM[c]]})
+          reefs = pd.concat([reefs,temp_reef],ignore_index=True)
+print(reefs['Sites'],['Coral'])
+
+reefs.plot(x = 'Year', y = ['Coral', 'Macro'])
+plt.plot(reefs['Sites'], ['Coral'])
+plt.plot(reefs['Sites'], ['Macro'])
+
+plt.show()
+
 
      
 
