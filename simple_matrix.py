@@ -90,7 +90,7 @@ for year in range(0,n_years):
           reefs = pd.concat([reefs,temp_reef],ignore_index=True)
 print(reefs['Sites'],['Coral'])
 
-reefs.plot(x = 'Year', y = ['Coral', 'Macro'])
+reefs.plot(xlim=(0,4), ylim =(0,1))
 plt.plot(reefs['Sites'], ['Coral'])
 plt.plot(reefs['Sites'], ['Macro'])
 
