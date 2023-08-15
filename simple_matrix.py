@@ -52,7 +52,7 @@ for c in corals:
     lastM.append(0.1)
 
 # set up the dataframe here
-reefs = pd.DataFrame(columns = ['Year', 'Sites', 'Coral', 'Macro'])    
+reefs = pd.DataFrame(columns = ['Year', 'Sites', 'Type', 'Value'])    
 
 
 for year in range(0,n_years):
@@ -86,9 +86,34 @@ for year in range(0,n_years):
           lastM[c] = corals[c].output[1,1]
     # print(lastC)
      #print(lastM)
-          temp_reef = pd.DataFrame.from_dict({'Year': [year], "Sites": [c], "Coral": [lastC[c]], "Macro": [lastM[c]]})
+          temp_reef = pd.DataFrame.from_dict({'Year': [year, year], "Sites": [c, c], "Type": ['Coral', 'Macro'], "Value": [lastC[c], lastM[c]]})
           reefs = pd.concat([reefs,temp_reef],ignore_index=True)
-print(reefs['Sites'],['Coral'])
+#print(reefs['Sites'],['Coral'])
+
+# create 3 arrays:
+
+# time = 1D array (like: [1, 2, 3, 4, 5]
+# corals = 2D array:
+#   0.1   0.23
+#   0.1   0.23
+#   ...   ..
+#   0.23  0.23
+# columns are same length as time, each column is a different site.
+# macros is the same structure as corals.
+
+
+fig_summary=plt.figure(figsize=(12.0,6),dpi=360)
+ax=fig_summary.add_subplot(111)
+colours = ['#377eb8', '#ff7f00', '#4daf4a',
+           '#a65628', '#984ea3', '#f780bf',
+           '#999999', '#e41a1c', '#dede00']
+
+# loop over sites, plot the coral and macro lines for each site, looping over colours
+for c in range(0,2):
+    ax.plot(times, corals[c][:], label="Reef "+str(c)+" Coral", color=colours[c])
+    ax.plot(times, macros[c][:], label="Reef "+str(c)+" Macro", linestyle="--", color=colours[c])
+ 
+
 
 reefs.plot(x = 'Year', y = ['Coral', 'Macro'])
 plt.plot(reefs['Sites'], ['Coral'])
