@@ -44,14 +44,20 @@ np.shape(start_conditions)
 
 
 num_sites = start_conditions.shape[1]
+#print(num_sites)
 n_years = 5
 
 
 #create coral objects 
 corals = []
+# set up starting conditions
+tempM = []
+tempC = []
 
 for n in range(0,num_sites):
     corals.append(greiner.greiner()) #what did this do?
+    tempC.append(start_conditions[0])
+    tempM.append(start_conditions[1]) 
 
 
 # lists to hold final outputs for coral and macroalgae
@@ -59,15 +65,6 @@ lastC = []
 lastM = []
 times = []
 
-
-# set up starting conditions
-tempM = []
-tempC = []
-
-
-
-tempC.append(start_conditions[0])
-tempM.append(start_conditions[1])   
 
 lastC.append(tempC)
 lastM.append(tempM)
@@ -77,35 +74,39 @@ lastM.append(tempM)
 p_m = 1 
 r_area = 4.08/10000. #cm^2 area of settled recruit (fung appendix B)
 
+#print(c_matrix)
 for year in range(0,n_years):
       lsc_new = [] # list to hold updated lsc value
       times.append(year)
       for sink in range(0,num_sites): 
         Pl = 0
         for source in range(0,num_sites):
-            #print(c_matrix[source])
+            #print(c_matrix[sink])
             #begin calculating lsc
             Pl = Pl + (lastC[-1][source] * p_m * r_area * c_matrix[sink][source]) 
+            print(Pl)
         N = Pl * corals[sink].parameters["d"]
         T = 1 - lastC[-1][sink] - lastM[-1][sink]
         lsc_new.append((N * r_area) / T)
+        #print(lsc_new)
 
      
-# #       #now solve ode using new lsc
-# #       tempC = []
-# #       tempM = []
-# #       for c in range(0,num_sites):
-# #           #update lsc from above calculation
-# #           corals[c].set_parameter("lsc", float(lsc_new[c])) # set lsc in regard to the other reefs
-# #           corals[c].set_times([year,year+1])
-# #           corals[c].solve_time() #ode solver
-# #           #print(corals[c].output[1,:])
-# #           corals[c].set_start_conditions(corals[c].output[1,:].tolist())
-# #           tempC.append(corals[c].output[1,0])
-# #           tempM.append(corals[c].output[1,1])
+      #now solve ode using new lsc
+      tempC = []
+      tempM = []
+      for c in range(0,num_sites):
+          #update lsc from above calculation
+          #print(lsc_new[c])
+          corals[c].set_parameter("lsc", float(lsc_new[c])) # set lsc in regard to the other reefs
+          corals[c].set_times([year,year+1])
+          corals[c].solve_time() #ode solver
+          #print(corals[c].output[1,:])
+          corals[c].set_start_conditions(corals[c].output[1,:].tolist())
+          tempC.append(corals[c].output[1,0])
+          tempM.append(corals[c].output[1,1])
 
-# #       lastC.append(tempC)
-# #       lastM.append(tempM)
+      lastC.append(tempC)
+      lastM.append(tempM)
 
 # # times.append(n_years)
 

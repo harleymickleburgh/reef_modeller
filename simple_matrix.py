@@ -24,6 +24,7 @@ c_matrix = np.loadtxt("matrix_practice.csv",
                       delimiter=",", dtype=float)
 #display(c_matrix)
 np.shape(c_matrix)
+#print(c_matrix)
 
 # prep lsc calculations
 p_m = 1 
@@ -52,12 +53,14 @@ for year in range(0,n_years):
      for sink in range(0,num_sites): 
         Pl = 0
         for source in range(0,num_sites):
-            #print(c_matrix[source])
+            print(c_matrix[sink])
             #begin calculating lsc
             Pl = Pl + (lastC[-1][source] * p_m * r_area * c_matrix[sink][source]) 
+            print(Pl)
         N = Pl * corals[sink].parameters["d"]
         T = 1 - lastC[-1][sink] - lastM[-1][sink]
         lsc_new.append((N * r_area) / T)
+        #print(lsc_new)
 
      
      #now solve ode using new lsc
@@ -88,9 +91,9 @@ times.append(n_years)
 #   0.23  0.23
 # columns are same length as time, each column is a different site.
 # macros is the same structure as corals.
-print(times)
-print(lastM)
-print(lastC)
+#print(times)
+#print(lastM)
+#print(lastC)
 times = np.array(times)
 lastC = np.array(lastC).transpose()
 lastM = np.array(lastM).transpose()
@@ -105,7 +108,7 @@ colours = ['#377eb8', '#ff7f00', '#4daf4a',
 
 # loop over sites, plot the coral and macro lines for each site, looping over colours
 for c in range(0,num_sites):
-    print(lastC[c])
+    #print(lastC[c])
     ax.plot(times, lastC[:][c], label="Reef "+str(c)+" Coral", color=colours[c])
     ax.plot(times, lastM[:][c], label="Reef "+str(c)+" Macro", linestyle="--", color=colours[c])
     
