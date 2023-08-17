@@ -8,7 +8,6 @@ Created on Tue Jul 25 14:15:34 2023
 
 import greiner
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 
 num_sites = 3
@@ -18,7 +17,7 @@ n_years = 5
 corals = []
 
 for n in range(0,num_sites):
-    corals.append(greiner.greiner()) #what did this do?
+    corals.append(greiner.greiner()) 
    
 #set up matrix
 c_matrix = np.loadtxt("matrix_practice.csv",
