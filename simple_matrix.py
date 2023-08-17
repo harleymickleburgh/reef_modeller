@@ -34,15 +34,18 @@ r_area = 4.08/10000. #cm^2 area of settled recruit (fung appendix B)
 lastC = []
 lastM = []
 times = []
-times.append(0)
 
 
 # set up starting conditions
+tempM = []
+tempC = []
 for c in corals:
     c.set_start_conditions([0.1,0.1])
-    lastC.append(0.1)
-    lastM.append(0.1)   
+    tempC.append(0.1)
+    tempM.append(0.1)   
 
+lastC.append(tempC)
+lastM.append(tempM)
 
 for year in range(0,n_years):
      lsc_new = [] # list to hold updated lsc value
@@ -52,14 +55,15 @@ for year in range(0,n_years):
         for source in range(0,num_sites):
             #print(c_matrix[source])
             #begin calculating lsc
-            Pl = Pl + (lastC[source] * p_m * r_area * c_matrix[sink][source]) 
+            Pl = Pl + (lastC[-1][source] * p_m * r_area * c_matrix[sink][source]) 
         N = Pl * corals[sink].parameters["d"]
-        T = 1 - lastC[sink] - lastM[sink]
+        T = 1 - lastC[-1][sink] - lastM[-1][sink]
         lsc_new.append((N * r_area) / T)
 
      
      #now solve ode using new lsc
-     
+     tempC = []
+     tempM = []
      for c in range(0,num_sites):
           #update lsc from above calculation
           corals[c].set_parameter("lsc", float(lsc_new[c])) # set lsc in regard to the other reefs
@@ -67,18 +71,14 @@ for year in range(0,n_years):
           corals[c].solve_time() #ode solver
           #print(corals[c].output[1,:])
           corals[c].set_start_conditions(corals[c].output[1,:].tolist())
-          lastC[c] = corals[c].output[1,0]
-          lastM[c] = corals[c].output[1,1]
-     #print(lastC)
-     #print(lastM)
-     #reshape the 1D arrays into 2D arrays
-     np.reshape(lastC, (-1,3))
-     #np.reshape(lastM, (-1,3))
-     print(lastC)
-     #print(lastM)          
+          tempC.append(corals[c].output[1,0])
+          tempM.append(corals[c].output[1,1])
 
-     times.pop(0)
-     #print(times)
+     lastC.append(tempC)
+     lastM.append(tempM)
+
+times.append(n_years)
+
 # create 3 arrays:
 
 # time = 1D array (like: [1, 2, 3, 4, 5]
@@ -89,25 +89,29 @@ for year in range(0,n_years):
 #   0.23  0.23
 # columns are same length as time, each column is a different site.
 # macros is the same structure as corals.
+print(times)
+print(lastM)
+print(lastC)
+times = np.array(times)
+lastC = np.array(lastC).transpose()
+lastM = np.array(lastM).transpose()
 
-
-     fig_summary=plt.figure(figsize=(12.0,6),dpi=360)
-     ax=fig_summary.add_subplot(111)
-     colours = ['#377eb8', '#ff7f00', '#4daf4a',
+fig_summary=plt.figure(figsize=(12.0,6),dpi=360)
+ax=fig_summary.add_subplot(111)
+colours = ['#377eb8', '#ff7f00', '#4daf4a',
             '#a65628', '#984ea3', '#f780bf',
               '#999999', '#e41a1c', '#dede00']
 
      
 
-# # loop over sites, plot the coral and macro lines for each site, looping over colours
-     # for c in range(0,2):
-     #     ax.plot(times, lastC[c][:], label="Reef "+str(c)+" Coral", color=colours[c])
+# loop over sites, plot the coral and macro lines for each site, looping over colours
+for c in range(0,num_sites):
+    print(lastC[c])
+    ax.plot(times, lastC[:][c], label="Reef "+str(c)+" Coral", color=colours[c])
+    ax.plot(times, lastM[:][c], label="Reef "+str(c)+" Macro", linestyle="--", color=colours[c])
     
-    
-     #     ax.plot(times, lastM[c][:], label="Reef "+str(c)+" Macro", linestyle="--", color=colours[c])
-    
-
-     # plt.show()
+ax.legend()
+plt.show()
 
 
      
