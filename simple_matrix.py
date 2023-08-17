@@ -73,8 +73,8 @@ for year in range(0,n_years):
      #print(lastM)
      #reshape the 1D arrays into 2D arrays
      np.reshape(lastC, (-1,3))
-     np.reshape(lastM, (-1,3))
-     #print(lastC)
+     #np.reshape(lastM, (-1,3))
+     print(lastC)
      #print(lastM)          
 
      times.pop(0)
@@ -97,15 +97,17 @@ for year in range(0,n_years):
             '#a65628', '#984ea3', '#f780bf',
               '#999999', '#e41a1c', '#dede00']
 
+     
+
 # # loop over sites, plot the coral and macro lines for each site, looping over colours
-     #for c in range(0,2):
-         #ax.plot(times, lastC[c][:], label="Reef "+str(c)+" Coral", color=colours[c])
+     # for c in range(0,2):
+     #     ax.plot(times, lastC[c][:], label="Reef "+str(c)+" Coral", color=colours[c])
     
     
-         #ax.plot(times, lastM[c][:], label="Reef "+str(c)+" Macro", linestyle="--", color=colours[c])
+     #     ax.plot(times, lastM[c][:], label="Reef "+str(c)+" Macro", linestyle="--", color=colours[c])
     
 
-     #plt.show()
+     # plt.show()
 
 
      
