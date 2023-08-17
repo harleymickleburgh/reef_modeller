@@ -38,7 +38,6 @@ start_conditions = np.loadtxt("swain_start_noheads.csv",
 
 start_conditions = np.divide(start_conditions,100)
 np.shape(start_conditions)
-print(start_conditions)
 #start_conditions = pd.read_csv("swain_reef_start.csv", sep=",", header=0, index_col=0 )
 #start_conditions = (start_conditions / 100)
 
@@ -65,16 +64,14 @@ times = []
 tempM = []
 tempC = []
 
-# print(start_conditions.values[:1])
-# print(start_conditions.values[1:])
 
-tempC.append(start_conditions.values[:1])
-tempM.append(start_conditions.values[1:])   
-#print(tempC)
-#print(tempM)
+
+tempC.append(start_conditions[0])
+tempM.append(start_conditions[1])   
 
 lastC.append(tempC)
 lastM.append(tempM)
+
 
 # prep lsc calculations
 p_m = 1 
@@ -94,57 +91,57 @@ for year in range(0,n_years):
         lsc_new.append((N * r_area) / T)
 
      
-#       #now solve ode using new lsc
-#       tempC = []
-#       tempM = []
-#       for c in range(0,num_sites):
-#           #update lsc from above calculation
-#           corals[c].set_parameter("lsc", float(lsc_new[c])) # set lsc in regard to the other reefs
-#           corals[c].set_times([year,year+1])
-#           corals[c].solve_time() #ode solver
-#           #print(corals[c].output[1,:])
-#           corals[c].set_start_conditions(corals[c].output[1,:].tolist())
-#           tempC.append(corals[c].output[1,0])
-#           tempM.append(corals[c].output[1,1])
+# #       #now solve ode using new lsc
+# #       tempC = []
+# #       tempM = []
+# #       for c in range(0,num_sites):
+# #           #update lsc from above calculation
+# #           corals[c].set_parameter("lsc", float(lsc_new[c])) # set lsc in regard to the other reefs
+# #           corals[c].set_times([year,year+1])
+# #           corals[c].solve_time() #ode solver
+# #           #print(corals[c].output[1,:])
+# #           corals[c].set_start_conditions(corals[c].output[1,:].tolist())
+# #           tempC.append(corals[c].output[1,0])
+# #           tempM.append(corals[c].output[1,1])
 
-#       lastC.append(tempC)
-#       lastM.append(tempM)
+# #       lastC.append(tempC)
+# #       lastM.append(tempM)
 
-# times.append(n_years)
+# # times.append(n_years)
 
-# # create 3 arrays:
+# # # create 3 arrays:
 
-# # time = 1D array (like: [1, 2, 3, 4, 5]
-# # corals = 2D array:
-# #   0.1   0.23
-# #   0.1   0.23
-# #   ...   ..
-# #   0.23  0.23
-# # columns are same length as time, each column is a different site.
-# # macros is the same structure as corals.
-# print(times)
-# print(lastM)
-# print(lastC)
-# times = np.array(times)
-# lastC = np.array(lastC).transpose()
-# lastM = np.array(lastM).transpose()
+# # # time = 1D array (like: [1, 2, 3, 4, 5]
+# # # corals = 2D array:
+# # #   0.1   0.23
+# # #   0.1   0.23
+# # #   ...   ..
+# # #   0.23  0.23
+# # # columns are same length as time, each column is a different site.
+# # # macros is the same structure as corals.
+# # print(times)
+# # print(lastM)
+# # print(lastC)
+# # times = np.array(times)
+# # lastC = np.array(lastC).transpose()
+# # lastM = np.array(lastM).transpose()
 
-# fig_summary=plt.figure(figsize=(12.0,6),dpi=360)
-# ax=fig_summary.add_subplot(111)
-# colours = ['#377eb8', '#ff7f00', '#4daf4a',
-#             '#a65628', '#984ea3', '#f780bf',
-#               '#999999', '#e41a1c', '#dede00']
+# # fig_summary=plt.figure(figsize=(12.0,6),dpi=360)
+# # ax=fig_summary.add_subplot(111)
+# # colours = ['#377eb8', '#ff7f00', '#4daf4a',
+# #             '#a65628', '#984ea3', '#f780bf',
+# #               '#999999', '#e41a1c', '#dede00']
 
      
 
-# # loop over sites, plot the coral and macro lines for each site, looping over colours
-# for c in range(0,num_sites):
-#     print(lastC[c])
-#     ax.plot(times, lastC[:][c], label="Reef "+str(c)+" Coral", color=colours[c])
-#     ax.plot(times, lastM[:][c], label="Reef "+str(c)+" Macro", linestyle="--", color=colours[c])
+# # # loop over sites, plot the coral and macro lines for each site, looping over colours
+# # for c in range(0,num_sites):
+# #     print(lastC[c])
+# #     ax.plot(times, lastC[:][c], label="Reef "+str(c)+" Coral", color=colours[c])
+# #     ax.plot(times, lastM[:][c], label="Reef "+str(c)+" Macro", linestyle="--", color=colours[c])
     
-# ax.legend()
-# plt.show()
+# # ax.legend()
+# # plt.show()
 
 
      
