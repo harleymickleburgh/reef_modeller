@@ -22,9 +22,9 @@ for n in range(0,num_sites):
 #set up matrix
 c_matrix = np.loadtxt("matrix_practice.csv",
                       delimiter=",", dtype=float)
-#display(c_matrix)
+
 np.shape(c_matrix)
-#print(c_matrix)
+
 
 # prep lsc calculations
 p_m = 1 
@@ -53,14 +53,14 @@ for year in range(0,n_years):
      for sink in range(0,num_sites): 
         Pl = 0
         for source in range(0,num_sites):
-            print(c_matrix[sink])
+            #print(c_matrix[sink])
             #begin calculating lsc
             Pl = Pl + (lastC[-1][source] * p_m * r_area * c_matrix[sink][source]) 
-            print(Pl)
+            #print(Pl)
         N = Pl * corals[sink].parameters["d"]
         T = 1 - lastC[-1][sink] - lastM[-1][sink]
         lsc_new.append((N * r_area) / T)
-        #print(lsc_new)
+        
 
      
      #now solve ode using new lsc
@@ -78,7 +78,7 @@ for year in range(0,n_years):
 
      lastC.append(tempC)
      lastM.append(tempM)
-
+print(lastC)
 times.append(n_years)
 
 # create 3 arrays:

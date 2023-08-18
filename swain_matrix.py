@@ -37,14 +37,12 @@ start_conditions = np.loadtxt("swain_start_noheads.csv",
                       delimiter=",", dtype=float)
 
 start_conditions = np.divide(start_conditions,100)
-np.shape(start_conditions)
+start_conditions = start_conditions.tolist() #turn array into list of floats
 #start_conditions = pd.read_csv("swain_reef_start.csv", sep=",", header=0, index_col=0 )
 #start_conditions = (start_conditions / 100)
 
 
-
-num_sites = start_conditions.shape[1]
-#print(num_sites)
+num_sites = len(start_conditions[0])
 n_years = 5
 
 
@@ -56,8 +54,6 @@ tempC = []
 
 for n in range(0,num_sites):
     corals.append(greiner.greiner()) #what did this do?
-    tempC.append(start_conditions[0])
-    tempM.append(start_conditions[1]) 
 
 
 # lists to hold final outputs for coral and macroalgae
@@ -66,15 +62,23 @@ lastM = []
 times = []
 
 
+for c in corals:
+    for cpoint in start_conditions[0]:
+        for mpoint in start_conditions[1]:
+                print(cpoint, mpoint)
+                c.set_start_conditions([cpoint, mpoint]) # this may be very wrong, how to check?
+        tempC.append(cpoint) # but these are correct
+        tempM.append(mpoint)  
+
+
 lastC.append(tempC)
 lastM.append(tempM)
-
 
 # prep lsc calculations
 p_m = 1 
 r_area = 4.08/10000. #cm^2 area of settled recruit (fung appendix B)
 
-#print(c_matrix)
+
 for year in range(0,n_years):
       lsc_new = [] # list to hold updated lsc value
       times.append(year)
@@ -84,31 +88,32 @@ for year in range(0,n_years):
             #print(c_matrix[sink])
             #begin calculating lsc
             Pl = Pl + (lastC[-1][source] * p_m * r_area * c_matrix[sink][source]) 
-            print(Pl)
+            # print(Pl)
         N = Pl * corals[sink].parameters["d"]
         T = 1 - lastC[-1][sink] - lastM[-1][sink]
         lsc_new.append((N * r_area) / T)
         #print(lsc_new)
 
      
-      #now solve ode using new lsc
-      tempC = []
-      tempM = []
+       #now solve ode using new lsc
+
       for c in range(0,num_sites):
-          #update lsc from above calculation
-          #print(lsc_new[c])
-          corals[c].set_parameter("lsc", float(lsc_new[c])) # set lsc in regard to the other reefs
-          corals[c].set_times([year,year+1])
-          corals[c].solve_time() #ode solver
-          #print(corals[c].output[1,:])
-          corals[c].set_start_conditions(corals[c].output[1,:].tolist())
-          tempC.append(corals[c].output[1,0])
-          tempM.append(corals[c].output[1,1])
+        #update lsc from above calculation
+        #print(lsc_new[c])
+        corals[c].set_parameter("lsc", float(lsc_new[c])) # set lsc in regard to the other reefs
+        corals[c].set_times([year,year+1])
+        corals[c].solve_time() #ode solver
+        #print(corals[c].output[1,:])
+        corals[c].set_start_conditions(corals[c].output[1,:].tolist())
+        tempC.append(corals[c].output[1,0])
+        tempM.append(corals[c].output[1,1])
 
-      lastC.append(tempC)
-      lastM.append(tempM)
+        lastC.append(tempC)
+        lastM.append(tempM)
 
-# # times.append(n_years)
+print(lastC)
+
+times.append(n_years)
 
 # # # create 3 arrays:
 
