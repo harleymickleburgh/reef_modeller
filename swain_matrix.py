@@ -37,13 +37,13 @@ start_conditions = np.loadtxt("swain_start_noheads.csv",
                       delimiter=",", dtype=float)
 
 start_conditions = np.divide(start_conditions,100)
-start_conditions = start_conditions.tolist() #turn array into list of floats
+#start_conditions = start_conditions.tolist() #turn array into list of floats
 #start_conditions = pd.read_csv("swain_reef_start.csv", sep=",", header=0, index_col=0 )
 #start_conditions = (start_conditions / 100)
 
 
 num_sites = len(start_conditions[0])
-n_years = 5
+n_years = 50
 
 
 #create coral objects 
@@ -62,17 +62,19 @@ lastM = []
 times = []
 
 
+counter = 0
 for c in corals:
-    for cpoint in start_conditions[0]:
-        for mpoint in start_conditions[1]:
-                print(cpoint, mpoint)
-                c.set_start_conditions([cpoint, mpoint]) # this may be very wrong, how to check?
-        tempC.append(cpoint) # but these are correct
-        tempM.append(mpoint)  
+    cpoint = float(start_conditions[0][counter])
+    mpoint = float(start_conditions[1][counter])
+    c.set_start_conditions([cpoint, mpoint]) # this may be very wrong, how to check?
+    tempC.append(cpoint) # but these are correct
+    tempM.append(mpoint)
+    counter = counter+1
 
 
 lastC.append(tempC)
 lastM.append(tempM)
+
 
 # prep lsc calculations
 p_m = 1 
@@ -93,9 +95,13 @@ for year in range(0,n_years):
         T = 1 - lastC[-1][sink] - lastM[-1][sink]
         lsc_new.append((N * r_area) / T)
         #print(lsc_new)
+        
+        #now solve ode using new lsc
+      tempC = []
+      tempM = []
 
      
-       #now solve ode using new lsc
+        #now solve ode using new lsc
 
       for c in range(0,num_sites):
         #update lsc from above calculation
@@ -108,46 +114,46 @@ for year in range(0,n_years):
         tempC.append(corals[c].output[1,0])
         tempM.append(corals[c].output[1,1])
 
-        lastC.append(tempC)
-        lastM.append(tempM)
+      lastC.append(tempC)
+      lastM.append(tempM)
 
 print(lastC)
 
 times.append(n_years)
 
-# # # create 3 arrays:
+# create 3 arrays:
 
-# # # time = 1D array (like: [1, 2, 3, 4, 5]
-# # # corals = 2D array:
-# # #   0.1   0.23
-# # #   0.1   0.23
-# # #   ...   ..
-# # #   0.23  0.23
-# # # columns are same length as time, each column is a different site.
-# # # macros is the same structure as corals.
-# # print(times)
-# # print(lastM)
-# # print(lastC)
-# # times = np.array(times)
-# # lastC = np.array(lastC).transpose()
-# # lastM = np.array(lastM).transpose()
+# time = 1D array (like: [1, 2, 3, 4, 5]
+# corals = 2D array:
+#   0.1   0.23
+#   0.1   0.23
+#   ...   ..
+#   0.23  0.23
+# columns are same length as time, each column is a different site.
+# macros is the same structure as corals.
+print(times)
+print(lastM)
+print(lastC)
+times = np.array(times)
+lastC = np.array(lastC).transpose()
+lastM = np.array(lastM).transpose()
 
-# # fig_summary=plt.figure(figsize=(12.0,6),dpi=360)
-# # ax=fig_summary.add_subplot(111)
-# # colours = ['#377eb8', '#ff7f00', '#4daf4a',
-# #             '#a65628', '#984ea3', '#f780bf',
-# #               '#999999', '#e41a1c', '#dede00']
+fig_summary=plt.figure(figsize=(12.0,6),dpi=360)
+ax=fig_summary.add_subplot(111)
+colours = ['#377eb8', '#ff7f00', '#4daf4a',
+            '#a65628', '#984ea3', '#f780bf',
+              '#999999', '#e41a1c', '#dede00']
 
      
 
-# # # loop over sites, plot the coral and macro lines for each site, looping over colours
-# # for c in range(0,num_sites):
-# #     print(lastC[c])
-# #     ax.plot(times, lastC[:][c], label="Reef "+str(c)+" Coral", color=colours[c])
-# #     ax.plot(times, lastM[:][c], label="Reef "+str(c)+" Macro", linestyle="--", color=colours[c])
+# loop over sites, plot the coral and macro lines for each site, looping over colours
+for c in range(0,num_sites):
+    print(lastC[c])
+    ax.plot(times, lastC[:][c], label="Reef "+str(c)+" Coral", color=colours[c])
+    ax.plot(times, lastM[:][c], label="Reef "+str(c)+" Macro", linestyle="--", color=colours[c])
     
-# # ax.legend()
-# # plt.show()
+ax.legend()
+plt.show()
 
 
      
