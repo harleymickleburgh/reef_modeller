@@ -57,9 +57,10 @@ class greiner(CoralODELab):
         
         T = 1 - z[0] - z[1]
        #coral z[0]
-        growth = self.parameters['r']*(self.parameters['lbc'])*T*z[0]
+        growth = self.parameters['r']*self.parameters['lbc']*T*z[0]
         mortalityC = self.parameters['d']*z[0]
         Movergrowth = self.parameters['a']*z[1]*z[0]
+        # External recruitment: note lsc term needs multiplying by z[0] outside here
         recruitment = self.parameters['r']*self.parameters['lsc']*T
         dCdt = growth - mortalityC - Movergrowth + recruitment
        
@@ -67,6 +68,7 @@ class greiner(CoralODELab):
         MMovergrowth = self.parameters['a']*z[1]*z[0]
         grazing = (self.parameters['g']*z[1])/(z[1]+T)
         growthM1 = self.parameters['y']*(self.parameters['mlbc'])*z[1]*T
+        # External recruitment: note mlsc term need multiplying by z[1] outside here
         growthM2 = self.parameters['y']*self.parameters['mlsc']*T
         dMdt = MMovergrowth - grazing + growthM1 + growthM2
        
