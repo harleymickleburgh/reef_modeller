@@ -9,6 +9,7 @@ Created on Tue Jul 25 14:15:34 2023
 import greiner
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 num_sites = 3
 n_years = 5
@@ -23,7 +24,9 @@ for n in range(0,num_sites):
 c_matrix = np.loadtxt("matrix_practice.csv",
                       delimiter=",", dtype=float)
 
+c_matrix = np.divide(c_matrix,100)
 np.shape(c_matrix)
+print(c_matrix)
 
 
 # prep lsc calculations
@@ -79,6 +82,7 @@ for year in range(0,n_years):
      lastC.append(tempC)
      lastM.append(tempM)
 print(lastC)
+print(lastM)
 times.append(n_years)
 
 # create 3 arrays:
@@ -115,7 +119,9 @@ for c in range(0,num_sites):
 ax.legend()
 plt.show()
 
-
+lastC_pd = pd.DataFrame(lastC)
+lastC_pd= lastC_pd.round(decimals = 17)
+print(lastC_pd)
      
 
      
