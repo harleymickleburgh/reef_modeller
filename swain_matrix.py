@@ -111,7 +111,7 @@ for year in range(0,n_years):
       for c in range(0,num_sites):
         #update lsc from above calculation
         #print(lsc_new[c])
-        corals[c].set_parameter("g", 0.9)
+        #corals[c].set_parameter("g", 0.9)
         #corals[c].set_parameter("lbc", 0.01)
         corals[c].set_parameter("lsc", float(lsc_new[c])) # set lsc in regard to the other reefs
         corals[c].set_times([year,year+1])
