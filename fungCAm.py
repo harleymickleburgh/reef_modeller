@@ -22,11 +22,12 @@ class fungCAm(CoralODELab):
             "ac" : 0.25, #growth rate of corals over turf, relative to the rate over space
             "ec" : 0.1, #recruitment rate of corals onto turf, relative to the rate onto space 
             "sT" : 5, #growth rate of fine turf (occupying space) (yr^-1)
-            "vm" : 0.9,
-            "gm" : 3.5,
-            "rm" : 0.35,
-            "bm" : 0.9,
-            "ymc" : 0.1,
+            "vm" : 0.9, #proportion of total algal cover that is macroalgal cover
+            "gm" : 3.5, #maximum rate at which macroalgae is grazed (yr^-1)
+            "rm" : 0.35, #lateral growth rate of macroalgae over space
+            "bm" : 0.9, #coral growth is inhibited by presence of nearbymacroalgae
+            "ymc" : 0.1, #lateral growth rate of macroalgae over corals,relative to the rate over space
+            "ymt" : 0.1, #lateral growth rate of macroalgae over turf,relative to the rate over space
             
             }
         self.parameter_names = {
@@ -44,6 +45,7 @@ class fungCAm(CoralODELab):
             "rm" : "lateral growth rate of macroalgae over space",
             "bm" : "coral growth is inhibited by presence of nearbymacroalgae, represented as depression ofrCby the factor",
             "ymc" : "lateral growth rate of macroalgae over corals,relative to the rate over space",
+            "ymt" : "lateral growth rate of macroalgae over turf,relative to the rate over space"
             
             }
         
@@ -62,6 +64,7 @@ class fungCAm(CoralODELab):
             "rm" : [0.05, 0.4],
             "bm" : [0.2, 0.9],
             "ymc" : [0, 0.9],
+            "ymt" : [0,0.9]
             }
         self.citation = "Fung, T., Seymour, R. M., & Johnson, C. R. (2011). Alternative stable states and phase shifts in coral reefs under anthropogenic stress. Ecology, 92(4), 967–982."
         
