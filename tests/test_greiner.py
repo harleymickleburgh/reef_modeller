@@ -95,9 +95,10 @@ class TestModelCollection(unittest.TestCase):
             coralModel.set_times(t.tolist())
 
     def test_solve_time(self):
-        # set up the fungCAm equations such that the dc/dt and dm/dt are small
+        # set up the equations such that the dc/dt and dm/dt are small
         # and the solver (which alters it's internal timestep) and a calculation
         # by hand are roughly the same to 4 DP
+        # Griener et al 2022 fig 2a
 
         parameters = {
                 "r" : 0.55, #growth
@@ -105,10 +106,10 @@ class TestModelCollection(unittest.TestCase):
                 "a" : 0.1,# coral overgrowth
                 "g" : 0.8,# grazing (use fung?)
                 "y" : 0.77, # turf overgrowth
-                "lbc" : 0.0, # divided elmhirst value of all coral recruitment 0.005
-                "lsc" : 0.0,
-                "mlbc" : 0.0,
-                "mlsc" : 0.0,
+                "lbc" : 1, 
+                "lsc" : 0.0, # so we don't have to worry about multiplying by C
+                "mlbc" : 1,
+                "mlsc" : 0,
                 }
         
         start = [0.8, 0]
@@ -134,9 +135,9 @@ class TestModelCollection(unittest.TestCase):
                 "a" : 0.1,# coral overgrowth
                 "g" : 0.1,# grazing (use fung?)
                 "y" : 0.1, # turf overgrowth
-                "lbc" : 0.1, # divided elmhirst value of all coral recruitment 0.005
+                "lbc" : 0.9, # divided elmhirst value of all coral recruitment 0.005
                 "lsc" : 0.1,
-                "mlbc" : 0.1,
+                "mlbc" : 0.9,
                 "mlsc" : 0.1,
                   }
           coralModel = greiner()

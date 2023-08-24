@@ -56,17 +56,25 @@ class greiner(CoralODELab):
             """
         
         T = 1 - z[0] - z[1]
-       #coral z[0]
-        growth = self.parameters['r']*(self.parameters['lbc'])*T*z[0]
+        # coral z[0]
+        # this is internal recruitment, aka brooding corals
+        growth = self.parameters['r']*self.parameters['lbc']*T*z[0]
         mortalityC = self.parameters['d']*z[0]
         Movergrowth = self.parameters['a']*z[1]*z[0]
+        # External recruitment: note lsc term needs multiplying by z[0] outside here
+        # this includes self-seeding from floating gametes/larvae
+        # that means the parameter lsc is actually the connectivity matrix x current C
         recruitment = self.parameters['r']*self.parameters['lsc']*T
         dCdt = growth - mortalityC - Movergrowth + recruitment
        
-       # macroalgae (z(1))
+        # macroalgae (z(1))
         MMovergrowth = self.parameters['a']*z[1]*z[0]
         grazing = (self.parameters['g']*z[1])/(z[1]+T)
+        # this is internal recruitment, aka growth
         growthM1 = self.parameters['y']*(self.parameters['mlbc'])*z[1]*T
+        # External recruitment: note mlsc term need multiplying by z[1] outside here
+        # that means the parameter mlsc is actually the connectivity matrix x current M
+        # this includes self-seeding recruitment from floating gametes
         growthM2 = self.parameters['y']*self.parameters['mlsc']*T
         dMdt = MMovergrowth - grazing + growthM1 + growthM2
        

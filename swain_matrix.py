@@ -27,7 +27,7 @@ c_matrix = np.loadtxt("swain_matrix.csv",
 
 c_matrix = np.divide(c_matrix,100)
 np.shape(c_matrix)
-
+print(c_matrix)
 #list of reef names
 reef_list = ['Horseshoe Reef','Chinaman Reef', 'Wade Reef', 'Jenkins Reef']
 
@@ -82,6 +82,9 @@ lastM.append(tempM)
 # prep lsc calculations
 p_m = 1 
 r_area = 4.08/10000. #cm^2 area of settled recruit (fung appendix B)
+for sink in range(0,num_sites): 
+    for source in range(0,num_sites):
+        print(reef_list[sink], reef_list[source], c_matrix[sink][source])
 
 
 for year in range(0,n_years):
@@ -92,7 +95,7 @@ for year in range(0,n_years):
         for source in range(0,num_sites):
         #     #print(c_matrix[sink])
         #     #begin calculating lsc
-              Pl = Pl + (c_matrix[sink][source] * lastC[-1][source])
+            Pl = Pl + (c_matrix[sink][source] * lastC[-1][source])
         #     Pl = Pl + (lastC[-1][source] * p_m * r_area * c_matrix[sink][source]) 
         #     # print(Pl)
         # N = Pl * corals[sink].parameters["d"]
@@ -111,8 +114,9 @@ for year in range(0,n_years):
       for c in range(0,num_sites):
         #update lsc from above calculation
         #print(lsc_new[c])
-        #corals[c].set_parameter("g", 0.9)
-        #corals[c].set_parameter("lbc", 0.01)
+        corals[c].set_parameter("g", 0.28)
+        corals[c].set_parameter("lbc", 0.5)
+        corals[c].set_parameter("mlbc", 0.4)
         corals[c].set_parameter("lsc", float(lsc_new[c])) # set lsc in regard to the other reefs
         corals[c].set_times([year,year+1])
         corals[c].solve_time() #ode solver

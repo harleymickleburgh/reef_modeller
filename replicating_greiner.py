@@ -39,7 +39,13 @@ for year in range(0, num_years):
      site_1.set_parameter("lsc", pc * site_2.coral_cover)
      site_2.set_parameter("lsc", qc * site_1.coral_cover)
      site_1.set_parameter("mlsc", pm * site_2.macroalgae_cover)
-     site_2.set_parameter("mlsc", qm * site_1.macroalgae_cover)     
+     site_2.set_parameter("mlsc", qm * site_1.macroalgae_cover)    
+     site_1.set_parameter("lbc", (1-pc))
+     site_2.set_parameter("lbc", (1-qc))
+     site_1.set_parameter("mlbc", (1-pm))
+     site_1.set_parameter("mlbc", (1-pm))
+
+
      
      site_1.set_times([year,year+1])
      site_1.solve_time()
