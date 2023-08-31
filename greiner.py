@@ -19,9 +19,9 @@ class greiner(CoralODELab):
             "g" : 0.77,# grazing (use fung?)
             "y" : 0.77, # turf overgrowth
             "lbc" : 0.0025, # divided elmhirst value of all coral recruitment 0.005
-            "lsc" : 0.0025,
-            "mlbc" : 0.0025,
-            "mlsc" : 0.0025,
+            "lsc" : 0.0025, #external coral recruitment
+            "mlbc" : 0.0025, # local algae recruitment
+            "mlsc" : 0.0025, # external algae recruitment
             
             }
         self.parameter_names = {

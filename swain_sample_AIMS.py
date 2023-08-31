@@ -39,7 +39,8 @@ mplot = wide2.plot.line(ax=ax, x='year', y = 'algae_cover', linestyle='--', colo
 plt.title("Reef population change")
 plt.xlabel('Years')
 plt.ylabel('Population %')
-plt.xlim(2006, 2023)
+plt.xlim(2006, 2009)
+plt.ylim(0, 50)
 
 #for i in range(len(cplot)):
 #   cplot[i].set_color(colours[i])

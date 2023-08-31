@@ -46,7 +46,7 @@ start_conditions = np.divide(start_conditions,100)
 
 
 num_sites = len(start_conditions[0])
-n_years = 17
+n_years = 3
 
 
 #create coral objects 
@@ -112,8 +112,8 @@ for year in range(0,n_years):
         #print(lsc_new[c])
         corals[c].set_parameter("theta" , 0.9) #grazing pressure
         corals[c].set_parameter("dc" , 0.02) #coral mortality rate (yr^-1)
-        corals[c].set_parameter("lbc" , 0.5) #rate at which coral larvae, produced by local established brooding corals, recruit onto space (yr^-1)
-        corals[c].set_parameter("lsc" , 0.00006) #rate at which exogenus spawning coral larvae recruit onto space (yr^-1)
+        corals[c].set_parameter("lbc" , 0.00005) #rate at which coral larvae, produced by local established brooding corals, recruit onto space (yr^-1)
+        #corals[c].set_parameter("lsc" , 0.00006) #rate at which exogenus spawning coral larvae recruit onto space (yr^-1)
         corals[c].set_parameter("rc" , 0.2) # lateral growth rate of corals over space (yr^-1)
         corals[c].set_parameter("gT" , 10) #maximum rate at which turf algae is grazed (yr^-1)
         corals[c].set_parameter("ac" , 0.8) #growth rate of corals over turf, relative to the rate over space
@@ -160,14 +160,14 @@ for c in range(0,num_sites):
     ax.plot(times, lastC[:][c], label= reef_list[c]+ " Coral", color=colours[c])
     ax.plot(times, lastM[:][c], label= reef_list[c]+ " Macro", linestyle="--", color=colours[c])
 
-plt.xticks(np.arange(min(times), max(times)+1, 2))
+plt.xticks(np.arange(min(times), max(times)+1, 1))
 current_values = plt.gca().get_yticks()
 plt.gca().set_yticklabels(['{:,.0%}'.format(x) for x in current_values])
 ax.legend()
 plt.title("Reef population change")
 plt.xlabel('Years')
 plt.ylabel('Population %')
-plt.xlim(2006, 2023)
+plt.xlim(2006, 2009)
 # plt.axvline(x = 2009, color = 'r', ls=':', lw=1)
 # plt.axvline(x = 2011, color = 'r', ls=':', lw=1)
 # plt.axvline(x = 2015, color = 'r', ls=':', lw=1)
