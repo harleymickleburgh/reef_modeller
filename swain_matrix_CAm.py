@@ -142,6 +142,11 @@ times = np.array(times)
 lastC = np.array(lastC).transpose()
 lastM = np.array(lastM).transpose()
 
+
+output = pd.DataFrame(columns=["Reef ID", "Year", "Coral %", "Macroalgae %"])
+#print(output)
+
+
 fig_summary=plt.figure(figsize=(12.0,6),dpi=360)
 ax=fig_summary.add_subplot(111)
 # horseshoe = '#377eb8'
@@ -152,6 +157,7 @@ colours = ['#377eb8', '#ff7f00', '#4daf4a',
             '#a65628', '#984ea3', '#f780bf',
               '#999999', '#e41a1c', '#dede00']
 
+
      
 
 # loop over sites, plot the coral and macro lines for each site, looping over colours
@@ -159,6 +165,7 @@ for c in range(0,num_sites):
     #print(lastC[c])
     ax.plot(times, lastC[:][c], label= reef_list[c]+ " Coral", color=colours[c])
     ax.plot(times, lastM[:][c], label= reef_list[c]+ " Macro", linestyle="--", color=colours[c])
+
 
 plt.xticks(np.arange(min(times), max(times)+1, 1))
 current_values = plt.gca().get_yticks()
