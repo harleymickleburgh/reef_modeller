@@ -36,7 +36,10 @@ reef_list = ['Horseshoe Reef','Chinaman Reef', 'Wade Reef', 'Jenkins Reef']
 #set up start conditions
 # row 1 is corals
 #row 2 is algae
-start_conditions = np.loadtxt("swain_start_noheads.csv",
+# start_conditions = np.loadtxt("swain_start_noheads.csv",
+#                       delimiter=",", dtype=float)
+#alterning start conditions to see how the figure reacts
+start_conditions = np.loadtxt("swain_start_noheads_altered.csv",
                       delimiter=",", dtype=float)
 
 start_conditions = np.divide(start_conditions,100)
@@ -46,7 +49,7 @@ start_conditions = np.divide(start_conditions,100)
 
 
 num_sites = len(start_conditions[0])
-n_years = 200
+n_years = 3
 
 
 #create coral objects 
@@ -156,7 +159,7 @@ plt.xticks(np.arange(min(times), max(times)+1, 20))
 current_values = plt.gca().get_yticks()
 plt.gca().set_yticklabels(['{:,.0%}'.format(x) for x in current_values])
 ax.legend()
-plt.title("Reef population change")
+plt.title("Reef population change - Greiner")
 plt.xlabel('Years')
 plt.ylabel('Population %')
 #plt.xlim(2006, 2023)
