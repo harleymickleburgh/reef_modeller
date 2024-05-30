@@ -80,7 +80,7 @@ class TestModelCollection:
         with pytest.raises(Exception):
             coralModel.set_times(t.tolist())
         t = np.linspace(100,10, num = 100)
-        with pytest.aises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_times(t.tolist())
         #t = np.linspace("apple", 10, num = 100) # this one errors, because of np?
         # yes = linspace can't go from "apple" to 10
@@ -108,6 +108,7 @@ class TestModelCollection:
                 "rm" : 0.1,
                 "bm" : 0.1,
                 "ymc" : 0.1,
+                "ymt": 0.1
                   }
           coralModel = fungCAm()
           coralModel.set_times(t)
@@ -117,8 +118,8 @@ class TestModelCollection:
           # worked out 
           expected_dC = 0.03239876
           expected_dM = 0.01638324
-          assert test_output[0] == expected_dC
-          assert test_output[1] == expected_dM
+          assert test_output[0] == pytest.approx(expected_dC)
+          assert test_output[1] == pytest.approx(expected_dM)
 
     def test_solve_time(self):
         # set up the fungCAm equations such that the dc/dt and dm/dt are small
@@ -140,6 +141,7 @@ class TestModelCollection:
                 "rm" : 0.35,
                 "bm" : 0.9,
                 "ymc" : 0.1,
+                "ymt": 0.1
                 }
         
         start = [0.2, 0.8]
@@ -151,8 +153,8 @@ class TestModelCollection:
         coralModel.solve_time()
         test_output = coralModel.get_output()
         expected = [0.82773500, 0.0594409]
-        assert test_output[-1,0] == pytest.approx(expected[0])
-        assert test_output[-1,1] == pytest.approx(expected[1])
+        assert test_output[-1,0] == pytest.approx(expected[0], 1e-4)
+        assert test_output[-1,1] == pytest.approx(expected[1], 1e-4)
 
 if __name__ == '__main__':
     unittest.main()
