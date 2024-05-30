@@ -161,7 +161,7 @@ class CoralODELab:
 
         #not sure what this function does again --> dont think the user does anything here?
 
-    def plot_through_time(self):
+    def plot_through_time(self, filename=None):
         """
         Plotting graph for population change (y axis) and time (x axis)
          
@@ -178,12 +178,12 @@ class CoralODELab:
         plt.legend()
         plt.title(self.model_name)
         plt.xlabel('Time (years)')
-        plt.ylabel('Population')
-        # TODO whata bout saving the image?
-        plt.show()  
-        # TODO what happens when there are three components? How could we manage that?
-        
-       # print(self.output[:,0], self.output[:,1])
+        plt.ylabel('% cover')
+        if filename == None
+            plt.show()  
+        else:
+            #save figure
+            pass
 
     def set_parameter(self,name,value):
         """
@@ -193,7 +193,6 @@ class CoralODELab:
         :type name: string
         :param value: value of the parameter to set
         :type value: float
-
 
         """
         # add check that the name is in the paramter set
@@ -217,12 +216,15 @@ class CoralODELab:
         """
 
         values = new_parameters.values()
-        #print(values)
         self._check_length(values,self.num_parameters,exact=True)
         self._check_value(list(values))
         keys = new_parameters.keys()
         expected_keys = self.parameters.keys()
         if (not (sorted(new_parameters.keys()) == sorted(self.parameters.keys()))):
+            diff1 = set(new_parameters) - set(self.parameters)
+            diff2 = set(self.parameters) - set(new_parameters)
+            print("Missing params", diff1)
+            print("Additional params", diff2)
             raise Exception("Parameters names do not match the options list. See docs")
 
         self.parameters = new_parameters

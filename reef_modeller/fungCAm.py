@@ -6,12 +6,12 @@ Created on Tue Jul  4 11:56:24 2023
 @author: kl909
 """
 
-from model_collection import *
+from CoralODELab import *
 
 class fungCAm(CoralODELab):
     def __init__(self):
         CoralODELab.__init__(self,"fungCAm")
-        self.num_parameters = 14
+        self.num_parameters = 15
         self.parameters = {
             "theta" : 0.7, #grazing pressure
             "dc" : 0.02, #coral mortality rate (yr^-1)

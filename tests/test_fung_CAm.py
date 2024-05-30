@@ -6,34 +6,22 @@ Created on Thu Jul 13 13:25:58 2023
 @author: kl909
 """
 
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Jul 12 10:56:18 2023
-
-@author: kl909
-"""
-
-import unittest
+import pytest
 import os
 import sys
 # make sure we use the devel version first
 sys.path.insert(0,os.path.dirname(os.path.realpath(__file__))+'/..')
+sys.path.insert(0,"reef_modeller")
+
 from fungCAm import *
 
-class TestModelCollection(unittest.TestCase):
+class TestModelCollection:
     """Tests the model collection class"""
-    def setUp(self):
-        return
-
-    def tearDown(self):
-        return
-
         
     def test_set_parameter(self):
         coralModel=fungCAm()
         coralModel.set_parameter("theta" , 0.2)
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_parameter("theta", -0.21)
 
     def test_set_parameters(self):
@@ -53,20 +41,21 @@ class TestModelCollection(unittest.TestCase):
                 "rm" : 0.35,
                 "bm" : 0.9,
                 "ymc" : 0.1,
+                "ymt" : 0.1
                 }
         coralModel.set_parameters(params)
         params["a"]= "banana"
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_parameters(params)
         params["a"]= -0.21
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_parameters(params)   
         params["a"]= 0.21
         params["banan"]= 0.21
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_parameters(params)
         params = "ikhbb"
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_parameters(params)        
 
     def test_set_start_conditions(self):
@@ -74,13 +63,13 @@ class TestModelCollection(unittest.TestCase):
         start=[0.8,0.2]
         coralModel.set_start_conditions(start)
         start = [-0.8, 0.2]
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_start_conditions(start)
         start = [0.4, 0.4, 0.4]
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_start_conditions(start)
         start = ["bob", "janet"]
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_start_conditions(start)
     
     def test_set_times(self):
@@ -88,19 +77,19 @@ class TestModelCollection(unittest.TestCase):
         t = np.linspace(0,100, num = 100)
         coralModel.set_times(t.tolist())
         t = np.linspace(-10,100, num = 100)
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_times(t.tolist())
         t = np.linspace(100,10, num = 100)
-        with self.assertRaises(Exception):
+        with pytest.aises(Exception):
             coralModel.set_times(t.tolist())
         #t = np.linspace("apple", 10, num = 100) # this one errors, because of np?
         # yes = linspace can't go from "apple" to 10
         t = ["apple", "banana", "orange"]
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_times(t.tolist())
             
     def test_ode(self):
-          # set up the mumby equations and check the ode function
+          # set up the equations and check the ode function
           # gives same answer as a "by-hand" calculation from the paper equations
           start = [0.1, 0.6]
           t = [0,1]
@@ -128,8 +117,8 @@ class TestModelCollection(unittest.TestCase):
           # worked out 
           expected_dC = 0.03239876
           expected_dM = 0.01638324
-          self.assertAlmostEqual(test_output[0],expected_dC)
-          self.assertAlmostEqual(test_output[1],expected_dM)
+          assert test_output[0] == expected_dC
+          assert test_output[1] == expected_dM
 
     def test_solve_time(self):
         # set up the fungCAm equations such that the dc/dt and dm/dt are small
@@ -162,8 +151,8 @@ class TestModelCollection(unittest.TestCase):
         coralModel.solve_time()
         test_output = coralModel.get_output()
         expected = [0.82773500, 0.0594409]
-        self.assertAlmostEqual(test_output[-1,0],expected[0],5)
-        self.assertAlmostEqual(test_output[-1,1],expected[1],5)
+        assert test_output[-1,0] == pytest.approx(expected[0])
+        assert test_output[-1,1] == pytest.approx(expected[1])
 
 if __name__ == '__main__':
     unittest.main()
