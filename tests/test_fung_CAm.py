@@ -11,7 +11,7 @@ import os
 import sys
 # make sure we use the devel version first
 sys.path.insert(0,os.path.dirname(os.path.realpath(__file__))+'/..')
-sys.path.insert(0,"reef_modeller")
+sys.path.insert(0,"../reef_modeller")
 
 from fungCAm import *
 
@@ -122,9 +122,6 @@ class TestModelCollection:
           assert test_output[1] == pytest.approx(expected_dM)
 
     def test_solve_time(self):
-        # set up the fungCAm equations such that the dc/dt and dm/dt are small
-        # and the solver (which alters it's internal timestep) and a calculation
-        # by hand are roughly the same to 4 DP
 
         parameters = {
                 "theta" : 0.7, #grazing pressure
