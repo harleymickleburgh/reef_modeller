@@ -156,5 +156,3 @@ class TestModelCollection:
         assert test_output[-1,0] == pytest.approx(expected[0], 1e-4)
         assert test_output[-1,1] == pytest.approx(expected[1], 1e-4)
 
-if __name__ == '__main__':
-    unittest.main()

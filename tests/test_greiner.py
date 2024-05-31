@@ -6,34 +6,20 @@ Created on Thu Jul 13 11:15:03 2023
 @author: kl909
 """
 
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Jul 12 10:56:18 2023
-
-@author: kl909
-"""
-
-import unittest
+import pytest
 import os
 import sys
 # make sure we use the devel version first
 sys.path.insert(0,os.path.dirname(os.path.realpath(__file__))+'/..')
+sys.path.insert(0,"reef_modeller")
 from greiner import *
 
-class TestModelCollection(unittest.TestCase):
-    """Tests the model collection class"""
-    def setUp(self):
-        return
-
-    def tearDown(self):
-        return
-
+class TestModelCollection():
         
     def test_set_parameter(self):
         coralModel=greiner()
         coralModel.set_parameter("g", 0.21)
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_parameter("g", -0.21)
 
     def test_set_parameters(self):
@@ -51,17 +37,17 @@ class TestModelCollection(unittest.TestCase):
                 }
         coralModel.set_parameters(params)
         params["a"]= "banana"
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_parameters(params)
         params["a"]= -0.21
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_parameters(params)   
         params["a"]= 0.21
         params["banan"]= 0.21
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_parameters(params)
         params = "ikhbb"
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_parameters(params)        
 
     def test_set_start_conditions(self):
@@ -69,13 +55,13 @@ class TestModelCollection(unittest.TestCase):
         start=[0.8,0.2]
         coralModel.set_start_conditions(start)
         start = [-0.8, 0.2]
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_start_conditions(start)
         start = [0.4, 0.4, 0.4]
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_start_conditions(start)
         start = ["bob", "janet"]
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_start_conditions(start)
     
     def test_set_times(self):
@@ -83,15 +69,15 @@ class TestModelCollection(unittest.TestCase):
         t = np.linspace(0,100, num = 100)
         coralModel.set_times(t.tolist())
         t = np.linspace(-10,100, num = 100)
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_times(t.tolist())
         t = np.linspace(100,10, num = 100)
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_times(t.tolist())
         #t = np.linspace("apple", 10, num = 100) # this one errors, because of np?
         # yes = linspace can't go from "apple" to 10
         t = ["apple", "banana", "orange"]
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             coralModel.set_times(t.tolist())
 
     def test_solve_time(self):
@@ -121,8 +107,8 @@ class TestModelCollection(unittest.TestCase):
         coralModel.solve_time()
         test_output = coralModel.get_output()
         expected = [0.563636, 0.0]
-        self.assertAlmostEqual(test_output[-1,0],expected[0],5)
-        self.assertAlmostEqual(test_output[-1,1],expected[1],5)
+        assert test_output[-1,0] == pytest.approx(expected[0])
+        assert test_output[-1,1] == pytest.approx(expected[1])
         
     def test_ode(self):
           # set up the mumby equations and check the ode function
@@ -148,9 +134,6 @@ class TestModelCollection(unittest.TestCase):
           # worked out 
           expected_dC = 0.0042
           expected_dM = 0.005088889
-          self.assertAlmostEqual(test_output[0],expected_dC)
-          self.assertAlmostEqual(test_output[1],expected_dM)
+          assert test_output[0] ==  pytest.approx(expected_dC)
+          assert test_output[1] == pytest.approx(expected_dM)
         
-
-if __name__ == '__main__':
-    unittest.main()
