@@ -6,7 +6,7 @@ Created on Mon Jul  3 15:59:18 2023
 @author: kl909
 """
 
-from model_collection import *
+from CoralODELab import *
 
 class Mcmanus(CoralODELab):
     def __init__(self):

@@ -6,7 +6,7 @@ Created on Tue Jul  4 11:42:58 2023
 
 @author: kl909
 """
-from model_collection import *
+from CoralODELab import *
 
 class greiner(CoralODELab):
     def __init__(self):

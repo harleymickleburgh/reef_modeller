@@ -1,4 +1,6 @@
-from model_collection import *
+from CoralODELab import *
+
+from scipy.optimize import fsolve
 
 
 class Mumby(CoralODELab):
@@ -8,7 +10,7 @@ class Mumby(CoralODELab):
         self.num_parameters = 5
         self.parameters = {
                 "a": 0.1,
-                "g": 0.5,
+                "g": 0.3,
                 "y": 0.77,
                 "r": 0.55,
                 "d": 0.24
@@ -60,28 +62,11 @@ class Mumby(CoralODELab):
        
 if __name__ == "__main__":
     # only run if called as a script, not imported
-    start = [0.5636363, 1.26518367e-08]
-    t = np.linspace(0,1, num = 2)
+    start = [0.2, 0.8]
     coralModel = Mumby()
-    coralModel.set_times(t.tolist())
     coralModel.set_start_conditions(start)
-    coralModel.solve_time()
-    coralModel.plot_through_time()
 
-    #coralModel.set_parameter("g", 0.5)
-    #coralModel.solve_time()
-    #coralModel.plot_through_time()
-    print(coralModel.model_name)
-    print(coralModel.citation)
-    
-    # params = {
-    #         "a": 0.1,
-    #         "g": 0.18976,
-    #         "y": 0.77,
-    #         "r": 0.55,
-    #         "d": 0.24
-    #         }
-    # coralModel.set_parameters(params)
+    eq = fsolve(coralModel.ode, start, args=(0))
 
-
+    print(eq)
      

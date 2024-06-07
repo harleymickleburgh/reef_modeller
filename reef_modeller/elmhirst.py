@@ -6,7 +6,7 @@ Created on Mon Jul 10 15:09:45 2023
 @author: kl909
 """
 
-from model_collection import *
+from CoralODELab import *
 
 class elmhirst(CoralODELab):
     def __init__(self):

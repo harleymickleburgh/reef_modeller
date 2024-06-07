@@ -2,9 +2,10 @@ import pytest
 import os
 import sys
 # make sure we use the devel version first
-sys.path.insert(0,os.path.dirname(os.path.realpath(__file__))+'/..')
 sys.path.insert(0,"../reef_modeller")
-from model_collection import *
+sys.path.insert(0,"reef_modeller")
+
+from CoralODELab import *
 
 class TestModelCollection():
 
