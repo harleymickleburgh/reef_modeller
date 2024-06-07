@@ -11,7 +11,7 @@ from coral_ode_lab import *
 class fungCTMm(CoralODELab):
     def __init__(self):
         CoralODELab.__init__(self,"fungCTMm")
-        self.num_parameters = 15
+        self.num_parameters = 14
         self.parameters = {
             "theta" : 0.2, #grazing pressure
             "dc" : 0.05, #coral mortality rate (yr^-1)
@@ -22,7 +22,6 @@ class fungCTMm(CoralODELab):
             "ac" : 0.25, #growth rate of corals over turf, relative to the rate over space
             "ec" : 0.1, #recruitment rate of corals onto turf, relative to the rate onto space 
             "sT" : 5, #growth rate of fine turf (occupying space) (yr^-1)
-            "vm" : 0.9,
             "gm" : 0.5,
             "rm" : 0.35,
             "bm" : 0.9,
@@ -40,7 +39,6 @@ class fungCTMm(CoralODELab):
             "ac" : "growth rate of corals over turf, relative to the rate over space",
             "ec" : "recruitment rate of corals onto turf, relative to the rate onto space",
             "sT" : "growth rate of fine turf (occupying space) (yr^-1)",
-            "vm" : "proportion of total algal cover that is macroalgal cover",
             "gm" : "maximum rate at which macroalgae is grazed",
             "rm" : "lateral growth rate of macroalgae over space",
             "bm" : "coral growth is inhibited by presence of nearbymacroalgae, represented as depression ofrCby the factor",
@@ -58,7 +56,6 @@ class fungCTMm(CoralODELab):
             "ac" : [0,1], #growth rate of corals over turf, relative to the rate over space
             "ec" : [0.05, 0.15], #recruitment rate of corals onto turf, relative to the rate onto space 
             "sT" : [2, 20], #growth rate of fine turf (occupying space) (yr^-1)
-            "vm" : [0, 1],
             "gm" : [],
             "rm" : [0.05, 0.4],
             "bm" : [0.2, 0.9],
