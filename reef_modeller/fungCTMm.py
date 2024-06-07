@@ -6,7 +6,7 @@ Created on Tue Jul  4 13:57:48 2023
 @author: kl909
 """
 
-from CoralODELab import *
+from coral_ode_lab import *
 
 class fungCTMm(CoralODELab):
     def __init__(self):

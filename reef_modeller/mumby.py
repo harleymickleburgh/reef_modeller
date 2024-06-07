@@ -1,4 +1,4 @@
-from CoralODELab import *
+from coral_ode_lab import *
 
 from scipy.optimize import fsolve
 

@@ -10,7 +10,6 @@ A collection of ODE reef models based on coral and algae interactions.
 from scipy.integrate import odeint
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import pyplot
 
 class CoralODELab:
     """This is a top-level class to use as an inherit class for all other models. We use it
@@ -36,7 +35,6 @@ class CoralODELab:
     :type parameter_range: dict[string: range]
     
     """
-   
 
     def __init__(self, model):
         """Constructor method
@@ -61,28 +59,27 @@ class CoralODELab:
 
     def _check_value(self,number):
 
-        if (type(number) == list):
+        if isinstance(number,list):
             for l in number:
-                if (not (type(l) == float or type(l) == int)):
+                if not (isinstance(l,float) or isinstance(l,int)):
                     raise Exception("Value entered in list is not an integer or float")
                 if l < 0:
-                    raise Exception("Value entered in list is negative, please insert positive number")
-        elif (type(number) == float or type(number) == int):
+                    raise Exception("Value entered in list is negative, \
+                                    please insert positive number")
+        elif isinstance(number,float) or isinstance(number,int):
             if number < 0:
-                raise Exception("Value entered is negative, please insert positive number") 
+                raise Exception("Value entered is negative, please insert positive number")
         else:
-            raise Exception("Value entered is not an integer or float") 
-
+            raise Exception("Value entered is not an integer or float")
 
 
     def _check_length(self, my_list, expected_length, exact=False):
 
         if (not exact and len(my_list)<expected_length):
             raise Exception("Entered wrong number of parameters") # jon check
-        if (exact and not (len(my_list) == expected_length)):
+        if (exact and not len(my_list) == expected_length):
             raise Exception("Entered wrong number of parameters") # jon check
 
-        return
 
     # this forces you to create an ode function
     # in every class that inherits this one
@@ -101,12 +98,13 @@ class CoralODELab:
         :rtype: list[float]
         
         """
-        
+
         raise Exception("Not Implemented")
 
     def set_times(self,times):
         """
-        Set how many years the model will run for, enter first and last year, e.g (0,10) for 10 years
+        Set how many years the model will run for, enter first and last year, 
+        e.g (0,10) for 10 years
         
         :param times: number of years model is being run for
         :type times: list[float]
@@ -115,28 +113,28 @@ class CoralODELab:
 
         self._check_length(times,2)
         self._check_value(times)
-        if (not sorted(times) == times):
+        if not sorted(times) == times:
             raise Exception("Times should be in ascending order")
 
         self.times = times
-          
+
 
     def set_start_conditions(self, start_conditions):
         """
-        S et the intial population cover of z(0) and z(1). Values must add up to 1
+        Set the intial population cover of z(0) and z(1). Values must add up to 1
         
         :param start_conditions: list of values for the start of the model. 1 per equation
         :type start_conditions: list[float]
         
         """
-        
+
         if self.model_name == "fungCTMm":
             self._check_length(start_conditions,3,exact=True)
         else:
             self._check_length(start_conditions,2,exact=True)
         self._check_value(start_conditions)
-        
-        if (sum(start_conditions) > 1):
+
+        if sum(start_conditions) > 1:
             raise Exception("Sum of starting conditions should be between 0 and 1")
 
         self.start_conditions = start_conditions
@@ -152,10 +150,10 @@ class CoralODELab:
         """
         # run the scipy ode integrator
         self.output = odeint(self.ode, self.start_conditions, self.times)
-        
+
         # set a limit of outputs to be between 0 and 1
         self.output = np.clip(self.output, 0, 1)
-            
+
         self.coral_cover = self.output[-1][0]
         self.macroalgae_cover = self.output[-1][1]
 
@@ -170,7 +168,7 @@ class CoralODELab:
          
         """
 
-        if (len(self.output) < 1):
+        if len(self.output) < 1:
             return
 
         # plot the results
@@ -182,8 +180,8 @@ class CoralODELab:
         plt.title(self.model_name)
         plt.xlabel('Time (years)')
         plt.ylabel('% cover')
-        if filename == None:
-            plt.show()  
+        if filename is None:
+            plt.show()
         else:
             #save figure
             pass
@@ -207,8 +205,8 @@ class CoralODELab:
         self._check_value(value)
 
         self.parameters[name] = value
-    
-        #TODO if value not within range, fail (not set up ranges for all though) ("value is outside range")
+
+        #TODO if value not within range, fail ("value is outside range")
 
     def set_parameters(self,new_parameters):
         """
@@ -223,7 +221,7 @@ class CoralODELab:
         self._check_value(list(values))
         keys = new_parameters.keys()
         expected_keys = self.parameters.keys()
-        if (not (sorted(new_parameters.keys()) == sorted(self.parameters.keys()))):
+        if not sorted(keys) == sorted(expected_keys):
             diff1 = set(new_parameters) - set(self.parameters)
             diff2 = set(self.parameters) - set(new_parameters)
             print("Missing params", diff1)
@@ -231,12 +229,8 @@ class CoralODELab:
             raise Exception("Parameters names do not match the options list. See docs")
 
         self.parameters = new_parameters
- 
-            
-       # if value not within range, fail (not set up ranges for all though) ("value is outside range"):
+
+       # if value not within range, fail ("value is outside range"):
 
     def get_output(self):
         return self.output
-            
-
-

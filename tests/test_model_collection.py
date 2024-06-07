@@ -5,7 +5,7 @@ import sys
 sys.path.insert(0,"../reef_modeller")
 sys.path.insert(0,"reef_modeller")
 
-from CoralODELab import *
+from coral_ode_lab import *
 
 class TestModelCollection():
 
