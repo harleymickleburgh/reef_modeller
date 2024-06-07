@@ -11,7 +11,7 @@ from CoralODELab import *
 class fungCAm(CoralODELab):
     def __init__(self):
         CoralODELab.__init__(self,"fungCAm")
-        self.num_parameters = 15
+        self.num_parameters = 14
         self.parameters = {
             "theta" : 0.7, #grazing pressure
             "dc" : 0.02, #coral mortality rate (yr^-1)
@@ -27,7 +27,6 @@ class fungCAm(CoralODELab):
             "rm" : 0.35, #lateral growth rate of macroalgae over space
             "bm" : 0.9, #coral growth is inhibited by presence of nearbymacroalgae
             "ymc" : 0.1, #lateral growth rate of macroalgae over corals,relative to the rate over space
-            "ymt" : 0.1, #lateral growth rate of macroalgae over turf,relative to the rate over space
             
             }
         self.parameter_names = {
@@ -45,7 +44,6 @@ class fungCAm(CoralODELab):
             "rm" : "lateral growth rate of macroalgae over space",
             "bm" : "coral growth is inhibited by presence of nearbymacroalgae, represented as depression ofrCby the factor",
             "ymc" : "lateral growth rate of macroalgae over corals,relative to the rate over space",
-            "ymt" : "lateral growth rate of macroalgae over turf,relative to the rate over space"
             
             }
         
@@ -64,7 +62,6 @@ class fungCAm(CoralODELab):
             "rm" : [0.05, 0.4],
             "bm" : [0.2, 0.9],
             "ymc" : [0, 0.9],
-            "ymt" : [0,0.9]
             }
         self.citation = "Fung, T., Seymour, R. M., & Johnson, C. R. (2011). Alternative stable states and phase shifts in coral reefs under anthropogenic stress. Ecology, 92(4), 967–982."
         
@@ -72,8 +69,10 @@ class fungCAm(CoralODELab):
         S = 1 - z[0] - z[1]
         
             #coral dC
-        recruitmentC = (self.parameters['lsc'] + self.parameters['lbc']*z[0])*(S+self.parameters['ec']*(1 - self.parameters['vm'])*z[1])
-        growthC = self.parameters['rc']*(1 - self.parameters['bm'] * self.parameters['vm'] * z[1])*(S + self.parameters['ac']*(1 -self.parameters['vm'])*z[1])*z[0]
+        recruitmentC = (self.parameters['lsc'] + self.parameters['lbc']*z[0]) * \
+                       (S+self.parameters['ec']*(1 - self.parameters['vm'])*z[1])
+        growthC = self.parameters['rc']*(1 - self.parameters['bm'] * self.parameters['vm'] * z[1]) * \
+                  (S + self.parameters['ac']*(1 -self.parameters['vm'])*z[1])*z[0]
         mortalityC = self.parameters['dc']*z[0]
         MgrowthC = self.parameters['ymc']*self.parameters['rm']*self.parameters['vm']*z[1]*z[0]
         dCdt = recruitmentC + growthC - mortalityC - MgrowthC

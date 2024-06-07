@@ -42,7 +42,6 @@ class TestModelCollection:
                 "rm" : 0.35,
                 "bm" : 0.9,
                 "ymc" : 0.1,
-                "ymt" : 0.1
                 }
         coralModel.set_parameters(params)
         params["a"]= "banana"
@@ -109,7 +108,6 @@ class TestModelCollection:
                 "rm" : 0.1,
                 "bm" : 0.1,
                 "ymc" : 0.1,
-                "ymt": 0.1
                   }
           coralModel = fungCAm()
           coralModel.set_times(t)
@@ -139,7 +137,6 @@ class TestModelCollection:
                 "rm" : 0.35,
                 "bm" : 0.9,
                 "ymc" : 0.1,
-                "ymt": 0.1
                 }
         
         start = [0.2, 0.8]

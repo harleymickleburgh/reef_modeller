@@ -129,8 +129,11 @@ class CoralODELab:
         :type start_conditions: list[float]
         
         """
-
-        self._check_length(start_conditions,2,exact=True)
+        
+        if self.model_name == "fungCTMm":
+            self._check_length(start_conditions,3,exact=True)
+        else:
+            self._check_length(start_conditions,2,exact=True)
         self._check_value(start_conditions)
         
         if (sum(start_conditions) > 1):
