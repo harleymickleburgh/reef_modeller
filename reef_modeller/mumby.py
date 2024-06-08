@@ -62,11 +62,36 @@ class Mumby(CoralODELab):
        
 if __name__ == "__main__":
     # only run if called as a script, not imported
-    start = [0.2, 0.8]
+    start = [0.5, 0.5]
     coralModel = Mumby()
     coralModel.set_start_conditions(start)
 
+    coralModel.set_parameter("g",0.0)
     eq = fsolve(coralModel.ode, start, args=(0))
-
     print(eq)
-     
+
+    coralModel.set_start_conditions(start)
+    coralModel.set_parameter("g",0.1)
+    eq = fsolve(coralModel.ode, start, args=(0))
+    print(eq)
+
+    coralModel.set_start_conditions(start)
+    coralModel.set_parameter("g",0.2)
+    eq = fsolve(coralModel.ode, start, args=(0))
+    print(eq)
+
+    coralModel.set_start_conditions(start)
+    coralModel.set_parameter("g",0.3)
+    eq = fsolve(coralModel.ode, start, args=(0))
+    print(eq)
+
+    coralModel.set_start_conditions(start)
+    coralModel.set_parameter("g",0.4)
+    eq = fsolve(coralModel.ode, start, args=(0))
+    print(eq)
+
+    coralModel.set_start_conditions(start)
+    coralModel.set_parameter("g",0.5)
+    eq = fsolve(coralModel.ode, start, args=(0))
+    print(eq)
+

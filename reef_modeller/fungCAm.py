@@ -7,6 +7,7 @@ Created on Tue Jul  4 11:56:24 2023
 """
 
 from coral_ode_lab import *
+from scipy.optimize import fsolve
 
 class fungCAm(CoralODELab):
     def __init__(self):
@@ -63,7 +64,9 @@ class fungCAm(CoralODELab):
             "bm" : [0.2, 0.9],
             "ymc" : [0, 0.9],
             }
-        self.citation = "Fung, T., Seymour, R. M., & Johnson, C. R. (2011). Alternative stable states and phase shifts in coral reefs under anthropogenic stress. Ecology, 92(4), 967–982."
+        self.citation = "Fung, T., Seymour, R. M., & Johnson, C. R. (2011). \
+                         Alternative stable states and phase shifts in coral \
+                         reefs under anthropogenic stress. Ecology, 92(4), 967–982."
         
     def ode(self, z, t):
         S = 1 - z[0] - z[1]
@@ -89,16 +92,32 @@ class fungCAm(CoralODELab):
             
 if __name__ == "__main__":
     # only run if called as a script, not imported
-    start = [0.8, 0.2]
-    t = np.linspace(0,100, num = 100)
-    coralModel = fungCAm() #call correct model here
-    coralModel.set_times(t.tolist())
+    start = [0.1, 0.6]
+    coralModel = fungCAm()
     coralModel.set_start_conditions(start)
-    coralModel.solve_time()
-    coralModel.plot_through_time()
 
-    coralModel.set_parameter("theta", 0.21)
-    coralModel.solve_time()
-    coralModel.plot_through_time()
-    print(coralModel.model_name)
-    print(coralModel.citation)            
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+
+    thetas = []
+    corals = []
+    algae = []
+    for theta in np.arange(0.2, 0.71, 0.01):
+        coralModel.set_start_conditions(start)        
+        coralModel.set_parameter("theta",theta)
+        eq = fsolve(coralModel.ode, start, args=(0))
+        thetas.append(theta)
+        corals.append(eq[0])
+        algae.append(eq[1])
+        
+
+    fig, ax = plt.subplots()
+    ax.plot(thetas, corals, label="Coral", color=coralModel._coral_colour)
+    ax.plot(thetas, algae, label="Algae", color=coralModel._malgae_colour)
+
+
+    ax.set(xlabel='Grazing', ylabel='Perc Cover')
+    ax.grid()
+
+    plt.show()
