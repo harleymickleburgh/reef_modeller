@@ -104,7 +104,7 @@ class TestModelCollection():
         # test the equations solver to a known steady steate taken from the paper
         # run for a long time (500 years!) to make sure we get there.
         parameters = {
-                "a": 0.1,
+                "a": 0.08,
                 "g": 0.5,
                 "y": 0.77,
                 "r": 0.55,
