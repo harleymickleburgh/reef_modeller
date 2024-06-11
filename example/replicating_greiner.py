@@ -6,61 +6,59 @@ Created on Thu Jul 27 15:29:01 2023
 @author: kl909
 """
 
-import greiner
+import sys
+sys.path.insert(0,"../")
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import pyplot
+import reef_modeller.greiner
+from scipy.optimize import fsolve
 
+n_sites = 2
 num_years = 500
 
 reefs = {}
-site_1 = greiner.greiner()
-site_2 = greiner.greiner()
-site_1.set_parameter("g",0.29)
-site_2.set_parameter("g",0.29)
-site_1.set_parameter("lsc",0.06)
-site_2.set_parameter("lsc",0.06)
-site_1.set_parameter("mlsc",0.06)
-site_2.set_parameter("mlsc",0.06)
+reefs["site_1"] = reef_modeller.greiner.greiner()
+reefs["site_2"] = reef_modeller.greiner.greiner()
+reefs["site_1"].set_parameter("g",0.29)
+reefs["site_2"].set_parameter("g",0.29)
+reefs["site_1"].set_parameter("lsc",0.06)
+reefs["site_2"].set_parameter("lsc",0.06)
+reefs["site_1"].set_parameter("mlsc",0.06)
+reefs["site_2"].set_parameter("mlsc",0.06)
 
 times = []
 coral = []
 macro = []
 pc = pm = qm = qc = 0.06
 
-site_1.set_start_conditions([0.08, 0.48])
-site_2.set_start_conditions([0.45, 0.08])
+reefs["site_1"].set_start_conditions([0.08, 0.48])
+reefs["site_2"].set_start_conditions([0.45, 0.08])
 
 times.append(0)
-coral.append([site_1.coral_cover, site_2.coral_cover])
-macro.append([site_1.macroalgae_cover, site_2.macroalgae_cover])
+coral.append([reefs["site_1"].coral_cover, reefs["site_2"].coral_cover])
+macro.append([reefs["site_1"].macroalgae_cover, reefs["site_2"].macroalgae_cover])
 
 for year in range(0, num_years):
-     site_1.set_parameter("lsc", pc * site_2.coral_cover)
-     site_2.set_parameter("lsc", qc * site_1.coral_cover)
-     site_1.set_parameter("mlsc", pm * site_2.macroalgae_cover)
-     site_2.set_parameter("mlsc", qm * site_1.macroalgae_cover)    
-     site_1.set_parameter("lbc", (1-pc))
-     site_2.set_parameter("lbc", (1-qc))
-     site_1.set_parameter("mlbc", (1-pm))
-     site_1.set_parameter("mlbc", (1-pm))
-
-
+     reefs["site_1"].set_parameter("lsc", pc * reefs["site_2"].coral_cover)
+     reefs["site_2"].set_parameter("lsc", qc * reefs["site_1"].coral_cover)
+     reefs["site_1"].set_parameter("mlsc", pm * reefs["site_2"].macroalgae_cover)
+     reefs["site_2"].set_parameter("mlsc", qm * reefs["site_1"].macroalgae_cover)    
+     reefs["site_1"].set_parameter("lbc", (1-pc))
+     reefs["site_2"].set_parameter("lbc", (1-qc))
+     reefs["site_1"].set_parameter("mlbc", (1-pm))
+     reefs["site_1"].set_parameter("mlbc", (1-pm))
      
-     site_1.set_times([year,year+1])
-     site_1.solve_time()
-     site_2.set_times([year,year+1])
-     site_2.solve_time()
+     reefs["site_1"].set_times([year,year+1])
+     reefs["site_1"].solve_time()
+     reefs["site_2"].set_times([year,year+1])
+     reefs["site_2"].solve_time()
 
-     site_1.set_start_conditions([float(site_1.coral_cover), float(site_1.macroalgae_cover)])
-     site_2.set_start_conditions([float(site_2.coral_cover), float(site_2.macroalgae_cover)])
+     reefs["site_1"].set_start_conditions([float(reefs["site_1"].coral_cover), float(reefs["site_1"].macroalgae_cover)])
+     reefs["site_2"].set_start_conditions([float(reefs["site_2"].coral_cover), float(reefs["site_2"].macroalgae_cover)])
 
      times.append(year+1)
-     coral.append([site_1.coral_cover, site_2.coral_cover])
-     macro.append([site_1.macroalgae_cover, site_2.macroalgae_cover])
-
-
-print(times[-1], coral[-1], macro[-1])
+     coral.append([reefs["site_1"].coral_cover, reefs["site_2"].coral_cover])
+     macro.append([reefs["site_1"].macroalgae_cover, reefs["site_2"].macroalgae_cover])
 
 # separate out reef 1 and 2 coral and macroalgae
 reef1coral= []
@@ -86,5 +84,4 @@ plt.legend()
 plt.title("Replicating Greiner (dispersal 0.06)")
 plt.xlabel('Time (years)')
 plt.ylabel('Population')
-# TODO whata bout saving the image?
 plt.show()  
