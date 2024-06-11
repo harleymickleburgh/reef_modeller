@@ -7,7 +7,6 @@ Created on Tue Jul  4 11:56:24 2023
 """
 
 from coral_ode_lab import *
-from scipy.optimize import fsolve
 
 class fungCAm(CoralODELab):
     def __init__(self):
@@ -98,6 +97,7 @@ if __name__ == "__main__":
 
     import numpy as np
     import matplotlib.pyplot as plt
+    from scipy.optimize import fsolve
 
 
     thetas = []

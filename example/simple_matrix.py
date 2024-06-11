@@ -6,13 +6,15 @@ Created on Tue Jul 25 14:15:34 2023
 @author: kl909
 """
 
-import greiner
+import sys
+sys.path.insert(0,"../")
+import reef_modeller.greiner as greiner
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
 num_sites = 3
-n_years = 5
+n_years = 50
 
 #create coral objects 
 corals = []
@@ -21,12 +23,10 @@ for n in range(0,num_sites):
     corals.append(greiner.greiner()) 
    
 #set up matrix
-c_matrix = np.loadtxt("matrix_practice.csv",
+c_matrix = np.loadtxt("../data/matrix_practice.csv",
                       delimiter=",", dtype=float)
 
-c_matrix = np.divide(c_matrix,100)
-np.shape(c_matrix)
-print(c_matrix)
+c_matrix = np.divide(c_matrix,10)
 
 
 # prep lsc calculations
@@ -81,8 +81,6 @@ for year in range(0,n_years):
 
      lastC.append(tempC)
      lastM.append(tempM)
-print(lastC)
-print(lastM)
 times.append(n_years)
 
 # create 3 arrays:
@@ -105,8 +103,8 @@ lastM = np.array(lastM).transpose()
 fig_summary=plt.figure(figsize=(12.0,6),dpi=360)
 ax=fig_summary.add_subplot(111)
 colours = ['#377eb8', '#ff7f00', '#4daf4a',
-            '#a65628', '#984ea3', '#f780bf',
-              '#999999', '#e41a1c', '#dede00']
+           '#a65628', '#984ea3', '#f780bf',
+           '#999999', '#e41a1c', '#dede00']
 
      
 
@@ -121,7 +119,6 @@ plt.show()
 
 lastC_pd = pd.DataFrame(lastC)
 lastC_pd= lastC_pd.round(decimals = 17)
-print(lastC_pd)
      
 
      
