@@ -10,6 +10,7 @@ A collection of ODE reef models based on coral and algae interactions.
 from scipy.integrate import odeint
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.optimize import fsolve
 
 class CoralODELab:
     """This is a top-level class to use as an inherit class for all other models. We use it
@@ -52,10 +53,11 @@ class CoralODELab:
         self.macroalgae_cover = 0
 
         # internal variables
-        self._coral_colour = "#F88379"
+        self._coral_colour  = "#F88379"
         self._malgae_colour = "#617D48"
+        self._algae_colour  = "#617D48"
         self._talgae_colour = "#5FC87E"
-        self._space_colour = "#9aa69d"
+        self._space_colour  = "#9aa69d"
 
     def _check_value(self,number):
 
@@ -116,7 +118,7 @@ class CoralODELab:
         if not sorted(times) == times:
             raise Exception("Times should be in ascending order")
 
-        self.times = np.linspace(times[0], times[1], 1)
+        self.times = np.arange(times[0], times[1]+1, 1)
 
 
     def set_start_conditions(self, start_conditions):
@@ -141,13 +143,15 @@ class CoralODELab:
         self.coral_cover = start_conditions[0]
         self.macroalgae_cover = start_conditions[1]
 
-    def solve_time(self, start=self.start_conditions):
+    def solve_time(self, start=None):
         """
         Solves the ODE over the times specified by the user. Stores output in self.output
 
         :return: self.output
         
         """
+        if start is None:
+            start = self.start_conditions
         # run the scipy ode integrator
         self.output = odeint(self.ode, start, self.times)
 
@@ -187,21 +191,97 @@ class CoralODELab:
             #save figure
             pass
 
+    def find_eq_points(self):
+        coral_counter = 0
+        start_conditions = []
+        # create set of starting conditions        
+        # bounds will always be [0, 1] and can only sum to 1
+        for coral in np.linspace(0.1,1,20):
+            for algae in np.linspace(0.1, 1-coral-1e-6, 20-coral_counter):
+                start_conditions.append([coral,algae])
+            
+            coral_counter += 1
+        
+        all_roots = []
+        stability = []
+        for init in start_conditions:
+            # workout the stability points
+            roots, infodict, ier, mesg = fsolve(self.ode, init, args=(0), full_output = True)
+            matrixr=np.zeros((2,2))                    # dim= number of linear equations
+            matrixr[np.triu_indices(2)]=infodict["r"]    # to unpack "r" into matrix
+            Jacobian=(infodict["fjac"].T).dot(matrixr)     # needs .T to get Q
+            eigenvalues=np.array(np.linalg.eigvals(Jacobian))
+            all_roots.append(roots)
+            # work out stability of that root
+            if isinstance(eigenvalues[0], complex):
+                if np.any(eigenvalues.real >= 0):
+                    stability.append(-1)
+                else:
+                    stability.append(1)
+            else:
+                if np.all(eigenvalues > 0):
+                    stability.append(-1)
+                elif np.all(eigenvalues < 0):
+                    stability.append(1)
+                else:
+                    stability.append(0)
+            
+        all_roots = np.array(all_roots)
+        # make small numbers zero in the roots
+        tol = 1e-10
+        all_roots[abs(all_roots) < tol] = 0.0
+        all_roots = all_roots.round(decimals=8)
+        stability = np.array(stability)
+
+        unique_roots = np.unique(all_roots,axis=0)
+        #remove any where the root < 0
+        unique_roots = unique_roots[np.all(unique_roots >= 0, axis=1)]
+        root_stability_type = []
+        # the stability is the minimum for all stabilities for each unqie root
+        for root in unique_roots:
+            indicies = np.where(np.all(root == all_roots,axis=1))
+            stab_for_root = np.min(stability[np.array(indicies[0])])
+            root_stability_type.append(stab_for_root)
+
+        return(unique_roots, root_stability_type)
+        
+
     def plot_phase_space(self):
 
         coral_counter = 0
         start_conditions = []
         # create set of starting conditions        
         # bounds will always be [0, 1] and can only sum to 1
-        for coral in np.linspace(0,1,21):
-            for algae in np.linspace(0, 1-coral-1e-6, 21-coral_counter):
+        for coral in np.linspace(0.1,1,20):
+            for algae in np.linspace(0.1, 1-coral-1e-6, 20-coral_counter):
                 start_conditions.append([coral,algae])
             
             coral_counter += 1
 
         # solve for 100 years and create solution
         self.set_times([0, 100])
-        sol=[ solve_time(self.ode,init) for init in start_conditions]
+        dx = 0.001
+        sol=[ self.solve_time(start=init) for init in start_conditions]
+        for solution in sol:
+            plt.plot(solution[:,0], solution[:,1],"k",alpha=0.5,linewidth=0.5)
+            plt.arrow(solution[1,0], solution[1,1], 
+                      dx*(solution[2,0]-solution[1,0]), 
+                      dx*(solution[2,1]-solution[1,1]), 
+                      shape='full', lw=0, color="k", alpha=0.5, length_includes_head=True, head_width=.015)
+        roots, type_root = self.find_eq_points()
+        for rr, tr in zip(roots, type_root):
+            if tr == -1:
+                plt.plot(rr[0], rr[1], 'or', markersize=7)
+            elif tr == 0:
+                plt.plot(rr[0], rr[1], 'ob', markersize=7)
+            else:
+                plt.plot(rr[0], rr[1], 'om', markersize=7)
+        plt.ylim(0,1)
+        plt.xlim(0,1)
+        plt.xlabel('Coral')
+        plt.ylabel('Algae')
+        plt.show()
+        #self.plot_through_time()
 
     def set_parameter(self,name,value):
         """

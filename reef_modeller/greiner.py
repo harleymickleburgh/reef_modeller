@@ -16,12 +16,12 @@ class greiner(CoralODELab):
             "r" : 0.55, #growth
             "d" : 0.24,# mortality 0.02 - 1.0
             "a" : 0.1,# coral overgrowth
-            "g" : 0.77,# grazing (use fung?)
+            "g" : 0.29,# grazing (use fung?)
             "y" : 0.77, # turf overgrowth
-            "lbc" : 0.0025, # divided elmhirst value of all coral recruitment 0.005
-            "lsc" : 0.0025, #external coral recruitment
-            "mlbc" : 0.0025, # local algae recruitment
-            "mlsc" : 0.0025, # external algae recruitment
+            "lbc" : 1.0, # divided elmhirst value of all coral recruitment 0.005
+            "lsc" : 0.00, #external coral recruitment
+            "mlbc" : 1.0, # local algae recruitment
+            "mlsc" : 0.00, # external algae recruitment
             
             }
         self.parameter_names = {
@@ -69,7 +69,10 @@ class greiner(CoralODELab):
        
         # macroalgae (z(1))
         MMovergrowth = self.parameters['a']*z[1]*z[0]
-        grazing = (self.parameters['g']*z[1])/(z[1]+T)
+        if -1e-8 < z[1]+T < 1e-8:
+            grazing = 0
+        else:
+            grazing = (self.parameters['g']*z[1])/(z[1]+T)
         # this is internal recruitment, aka growth
         growthM1 = self.parameters['y']*(self.parameters['mlbc'])*z[1]*T
         # External recruitment: note mlsc term need multiplying by z[1] outside here
