@@ -116,7 +116,7 @@ class CoralODELab:
         if not sorted(times) == times:
             raise Exception("Times should be in ascending order")
 
-        self.times = times
+        self.times = np.linspace(times[0], times[1], 1)
 
 
     def set_start_conditions(self, start_conditions):
@@ -141,15 +141,15 @@ class CoralODELab:
         self.coral_cover = start_conditions[0]
         self.macroalgae_cover = start_conditions[1]
 
-    def solve_time(self):
+    def solve_time(self, start=self.start_conditions):
         """
         Solves the ODE over the times specified by the user. Stores output in self.output
 
-        :return: nothing
+        :return: self.output
         
         """
         # run the scipy ode integrator
-        self.output = odeint(self.ode, self.start_conditions, self.times)
+        self.output = odeint(self.ode, start, self.times)
 
         # set a limit of outputs to be between 0 and 1
         self.output = np.clip(self.output, 0, 1)
@@ -157,10 +157,11 @@ class CoralODELab:
         self.coral_cover = self.output[-1][0]
         self.macroalgae_cover = self.output[-1][1]
 
+        return self.output
+
         # TODO: add last output to the two cover variables
         # TODO: make tests to check this
 
-        #not sure what this function does again --> dont think the user does anything here?
 
     def plot_through_time(self, filename=None):
         """
@@ -185,6 +186,22 @@ class CoralODELab:
         else:
             #save figure
             pass
+
+    def plot_phase_space(self):
+
+        coral_counter = 0
+        start_conditions = []
+        # create set of starting conditions        
+        # bounds will always be [0, 1] and can only sum to 1
+        for coral in np.linspace(0,1,21):
+            for algae in np.linspace(0, 1-coral-1e-6, 21-coral_counter):
+                start_conditions.append([coral,algae])
+            
+            coral_counter += 1
+
+        # solve for 100 years and create solution
+        self.set_times([0, 100])
+        sol=[ solve_time(self.ode,init) for init in start_conditions]
 
     def set_parameter(self,name,value):
         """
