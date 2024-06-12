@@ -13,14 +13,14 @@ class greiner(CoralODELab):
         CoralODELab.__init__(self,"greiner")
         self.num_parameters = 9
         self.parameters = {
-            "r" : 0.55, #growth
-            "d" : 0.24,# mortality 0.02 - 1.0
-            "a" : 0.1,# coral overgrowth
-            "g" : 0.29,# grazing (use fung?)
-            "y" : 0.77, # turf overgrowth
-            "lbc" : 1.0, # divided elmhirst value of all coral recruitment 0.005
-            "lsc" : 0.00, #external coral recruitment
-            "mlbc" : 1.0, # local algae recruitment
+            "r" : 0.55,    # growth
+            "d" : 0.24,    # mortality 0.02 - 1.0
+            "a" : 0.1,     # coral overgrowth
+            "g" : 0.29,    # grazing (use fung?)
+            "y" : 0.77,    # turf overgrowth
+            "lbc" : 1.0,   # divided elmhirst value of all coral recruitment 0.005
+            "lsc" : 0.00,  # external coral recruitment
+            "mlbc" : 1.0,  # local algae recruitment
             "mlsc" : 0.00, # external algae recruitment
             
             }
@@ -37,7 +37,16 @@ class greiner(CoralODELab):
            
             }
         self.parameter_ranges = {
-            
+            "r" : [0.55,0.55],  # growth
+            "d" : [0.24,0.24],  # mortality 0.02 - 1.0
+            "a" : [0.1,0.1],    # coral overgrowth
+            "g" : [0.01,0.99],    # grazing (use fung?)
+            "y" : [0.77,0.77],  # turf overgrowth
+            "lbc" : [0,1.0],    # divided elmhirst value of all coral recruitment 0.005
+            "lsc" : [0.0,1.0],  # external coral recruitment
+            "mlbc" : [0.0,1.0], # local algae recruitment
+            "mlsc" : [0.0,1.0], # external algae recruitment
+
             }
         self.citation = "Greiner, A., S. Darling, E., Fortin, M.-J., & Krkošek, M. (2022). The combined effects of dispersal and herbivores on stable states in coral reefs. Theoretical Ecology, 15(4), 321–335."
         

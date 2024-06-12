@@ -191,6 +191,37 @@ class CoralODELab:
             #save figure
             pass
 
+    def plot_bifurcation(self, parameter):
+
+        # get parameter range
+        param_range = np.linspace(self.parameter_ranges[parameter][0], self.parameter_ranges[parameter][1], 151)
+
+        all_roots = []
+        types = []
+        # loop through param range
+        for p in param_range:
+            self.set_parameter(parameter,p)
+            # find roots and remove unstable ones (saddles and stable)
+            roots, type_root = self.find_eq_points()
+            all_roots.append(roots)
+            types.append(type_root)
+        
+        # will have to plot as points
+        for rr, tr, p in zip(all_roots, types, param_range):
+            for r, t in zip(rr, tr):
+                if t == -1:
+                    plt.plot(p, r[0], 'sr', markersize=3)
+                elif t == 0:
+                    plt.plot(p, r[0], 'sb', markersize=3)
+                else:
+                    plt.plot(p, r[0], 'sm', markersize=3)
+        #plt.ylim(0,1)
+        plt.xlim(param_range[0], param_range[-1])
+        plt.xlabel(parameter)
+        plt.ylabel('Coral cover')
+        plt.show()
+
+
     def find_eq_points(self):
         coral_counter = 0
         start_conditions = []
@@ -210,6 +241,9 @@ class CoralODELab:
             matrixr=np.zeros((2,2))                    # dim= number of linear equations
             matrixr[np.triu_indices(2)]=infodict["r"]    # to unpack "r" into matrix
             Jacobian=(infodict["fjac"].T).dot(matrixr)     # needs .T to get Q
+            if (np.isnan(Jacobian).any()):
+                stability.append(-1)
+                continue
             eigenvalues=np.array(np.linalg.eigvals(Jacobian))
             all_roots.append(roots)
             # work out stability of that root
