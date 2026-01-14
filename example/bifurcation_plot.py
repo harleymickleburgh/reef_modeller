@@ -1,9 +1,9 @@
 
 import sys
-sys.path.insert(0,"../")
+sys.path.insert(0,"../src")
 import numpy as np
 import matplotlib.pyplot as plt
-import reef_modeller.greiner
+import greiner
 
-coral_model = reef_modeller.greiner.greiner()
+coral_model = greiner.greiner()
 coral_model.plot_bifurcation("g")
