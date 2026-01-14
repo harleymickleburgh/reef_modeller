@@ -10,8 +10,7 @@ import pytest
 import os
 import sys
 # make sure we use the devel version first
-sys.path.insert(0,"../reef_modeller")
-sys.path.insert(0,"reef_modeller")
+sys.path.insert(0,"../src")
 
 
 from fungCAm import *

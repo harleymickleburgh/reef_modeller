@@ -6,7 +6,7 @@ Created on Tue Jul  4 11:56:24 2023
 @author: kl909
 """
 
-from reef_modeller.coral_ode_lab import *
+from coral_ode_lab import *
 
 class fungCAm(CoralODELab):
     def __init__(self):
