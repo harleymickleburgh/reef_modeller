@@ -11,6 +11,7 @@ from coral_ode_lab import *
 class fungCTMm(CoralODELab):
     def __init__(self):
         CoralODELab.__init__(self,"fungCTMm")
+        self.num_eq = 3
         self.num_parameters = 14
         self.parameters = {
             "theta" : 0.2, #grazing pressure
@@ -111,14 +112,14 @@ class fungCTMm(CoralODELab):
 if __name__ == "__main__":
     # only run if called as a script, not imported
     start = [0.8, 0.1, 0.1]
-    t = np.linspace(0,100, num = 100)
+    t = [0,100]
     coralModel = fungCTMm() #call correct model here
     coralModel.set_times(t)
     coralModel.set_start_conditions(start)
     coralModel.solve_time()
     coralModel.plot_through_time()
 
-    coralModel.set_parameter("g", 0.21)
+    coralModel.set_parameter("theta", 0.21)
     coralModel.solve_time()
     coralModel.plot_through_time()
     print(coralModel.model_name)

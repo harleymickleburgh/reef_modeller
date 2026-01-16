@@ -51,6 +51,7 @@ class CoralODELab:
         self.parameter_range = {}
         self.coral_cover = 0
         self.macroalgae_cover = 0
+        self.turfalgae_cover = 0
 
         # internal variables
         self._coral_colour  = "#F88379"
@@ -123,14 +124,14 @@ class CoralODELab:
 
     def set_start_conditions(self, start_conditions):
         """
-        Set the intial population cover of z(0) and z(1). Values must add up to 1
+        Set the intial population cover of z(0) and z(1) (and z(2)). Values must add up to 1
         
         :param start_conditions: list of values for the start of the model. 1 per equation
         :type start_conditions: list[float]
         
         """
 
-        if self.model_name == "fungCTMm":
+        if self.num_eq == 3:
             self._check_length(start_conditions,3,exact=True)
         else:
             self._check_length(start_conditions,2,exact=True)
@@ -142,6 +143,8 @@ class CoralODELab:
         self.start_conditions = start_conditions
         self.coral_cover = start_conditions[0]
         self.macroalgae_cover = start_conditions[1]
+        if self.num_eq == 3:
+            self.turfalgae_cover = start_conditions[2]
 
     def solve_time(self, start=None):
         """
@@ -160,6 +163,8 @@ class CoralODELab:
 
         self.coral_cover = self.output[-1][0]
         self.macroalgae_cover = self.output[-1][1]
+        if self.num_eq == 3:
+            self.turfalgae_cover = self.output[-1][2]
 
         return self.output
 
@@ -178,7 +183,12 @@ class CoralODELab:
 
         # plot the results
         plt.plot(self.times, self.output[:,0], label="Coral", color=self._coral_colour)
-        plt.plot(self.times, self.output[:,1], label="Algae", color=self._malgae_colour)
+        if self.num_eq == 2:
+            plt.plot(self.times, self.output[:,1], label="Algae", color=self._malgae_colour)
+        elif self.num_eq == 3:
+            plt.plot(self.times, self.output[:,1], label="Macroalgae", color=self._malgae_colour)
+            plt.plot(self.times, self.output[:,2], label="Turf algae", color=self._talgae_colour)
+
         plt.ylim(0,1)
         plt.xlim(-1)
         plt.legend()
