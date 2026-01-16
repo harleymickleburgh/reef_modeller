@@ -168,9 +168,6 @@ class CoralODELab:
 
         return self.output
 
-        # TODO: add last output to the two cover variables
-        # TODO: make tests to check this
-
 
     def plot_through_time(self, filename=None):
         """
@@ -186,8 +183,8 @@ class CoralODELab:
         if self.num_eq == 2:
             plt.plot(self.times, self.output[:,1], label="Algae", color=self._malgae_colour)
         elif self.num_eq == 3:
-            plt.plot(self.times, self.output[:,1], label="Macroalgae", color=self._malgae_colour)
-            plt.plot(self.times, self.output[:,2], label="Turf algae", color=self._talgae_colour)
+            plt.plot(self.times, self.output[:,1], label="Turf algae", color=self._talgae_colour)
+            plt.plot(self.times, self.output[:,2], label="Macroalgae", color=self._malgae_colour)
 
         plt.ylim(0,1)
         plt.xlim(-1)
@@ -349,29 +346,18 @@ class CoralODELab:
 
         #TODO if value not within range, fail ("value is outside range")
 
-    def set_parameters(self,new_parameters):
+    def set_parameters(self,**updated_parameters):
         """
-        Set all parameters via a dictionary
-
-        :param new_parameters: set of parameter values
-        :type new_parameters: dictionary of names/value pairs
+        Update multiple parameters at once.
+        Usage: model.set_parameters(rc=0.8, theta=0.2)
         """
 
-        values = new_parameters.values()
-        self._check_length(values,self.num_parameters,exact=True)
-        self._check_value(list(values))
-        keys = new_parameters.keys()
-        expected_keys = self.parameters.keys()
-        if not sorted(keys) == sorted(expected_keys):
-            diff1 = set(new_parameters) - set(self.parameters)
-            diff2 = set(self.parameters) - set(new_parameters)
-            print("Missing params", diff1)
-            print("Additional params", diff2)
-            raise Exception("Parameters names do not match the options list. See docs")
-
-        self.parameters = new_parameters
-
-       # if value not within range, fail ("value is outside range"):
+        for key, value in updated_parameters.items():
+            if hasattr(self.p, key):
+                old_value = getattr(self.p, key)
+                setattr(self.p, key, value)
+            else:
+                print(f"Warning: Parameter '{key}' not found in model.")
 
     def get_output(self):
         return self.output

@@ -5,7 +5,7 @@ Created on Tue Jul  4 13:57:48 2023
 
 @author: kl909
 """
-
+from types import SimpleNamespace
 from coral_ode_lab import *
 
 class fungCTMm(CoralODELab):
@@ -27,9 +27,10 @@ class fungCTMm(CoralODELab):
             "rm" : 0.35,
             "bm" : 0.9,
             "ymc" : 0.1,
-            "ymt" : 0.9,
-            
+            "ymt" : 0.9,    
             }
+        self.p = SimpleNamespace(**self.parameters)
+    
         self.parameter_names = {
             "theta" : "grazing pressure",
             "dc" : "coral mortality rate (yr^-1)",
@@ -48,7 +49,7 @@ class fungCTMm(CoralODELab):
             }
         
         self.parameter_ranges = {
-            "theta" : [0.4, 1], #grazing pressure
+            "theta" : [0.2, 1], #grazing pressure
             "dc" : [0.02, 0.1], #coral mortality rate (yr^-1)
             "lbc" : [0.0009, 0.5], #rate at which coral larvae, produced by local established brooding corals, recruit onto space (yr^-1)
             "lsc" : [0.00006, 0.01], #rate at which exogenus spawning coral larvae recruit onto space (yr^-1)
@@ -82,28 +83,31 @@ class fungCTMm(CoralODELab):
 &- \underbrace{\alpha_c r_C (1-\beta_M M)TC}_{coral \,growth \,over \,turf} - \underbrace{\gamma_{MT} r_M MT)}_{macroalgal \, growth \, over \, turf}
 
         """
-        S = 1 - z[0] - z[1] - z[2]
-        
+        S = 1.0 - sum(z)
+        C = z[0]
+        M = z[2]
+        T = z[1]
+
         #coral dC
-        recruitmentC = (self.parameters['lsc'] + self.parameters['lbc']*z[0])*(S+self.parameters['ec']*z[1])
-        growthC = self.parameters['rc']*(1-self.parameters['bm']*z[2])*(S+self.parameters['ac']*z[1])*z[0]
-        mortalityC = self.parameters['dc']*z[0]
-        MgrowthC = self.parameters['ymc']*self.parameters['rm']*z[2]*z[0]
+        recruitmentC = (self.p.lsc + self.p.lbc*C)*(S+self.p.ec*T)
+        growthC = self.p.rc*(1-self.p.bm*M)*(S+self.p.ac*T)*C
+        mortalityC = self.p.dc*C
+        MgrowthC = self.p.ymc*self.p.rm*M*C
         
         dCdt = recruitmentC + growthC - mortalityC - MgrowthC
         
         #turf dT
-        growthT = self.parameters['sT']*(1-self.parameters['theta'])*S
-        grazingT = self.parameters['gT']*self.parameters['theta']*z[1]
-        CrecrtuitmentT = self.parameters['ec']*(self.parameters['lsc']+self.parameters['lbc']*z[0])*z[1] #coral recruitment on turf
-        CgrowthT = self.parameters['ac']*self.parameters['rc']*(1-self.parameters['bm']*z[2])*z[1]*z[0] #%coral growth over turf
-        MgrowthCT = self.parameters['ymt']*self.parameters['rm']*z[2]*z[1]
+        growthT = self.p.sT*(1-self.p.theta)*S
+        grazingT = self.p.gT*self.p.theta*T
+        CrecrtuitmentT = self.p.ec*(self.p.lsc+self.p.lbc*C)*T #coral recruitment on turf
+        CgrowthT = self.p.ac*self.p.rc*(1-self.p.bm*M)*T*M #%coral growth over turf
+        MgrowthCT = self.p.ymt*self.p.rm*M*T
         
         dTdt = growthT - grazingT - CrecrtuitmentT - CgrowthT - MgrowthCT
         
         #macroalgae dM
-        growthM = self.parameters['rm']*z[2]*(S+self.parameters['ymc']*z[0]+self.parameters['ymt']*z[1])
-        grazingM = self.parameters['gm']*self.parameters['theta']*z[2]
+        growthM = self.p.rm*M*(S+self.p.ymc*C+self.p.ymt*T)
+        grazingM = self.p.gm*self.p.theta*M
         
         dMdt = growthM - grazingM
         
@@ -113,13 +117,14 @@ if __name__ == "__main__":
     # only run if called as a script, not imported
     start = [0.8, 0.1, 0.1]
     t = [0,100]
-    coralModel = fungCTMm() #call correct model here
+    coralModel = fungCTMm() 
     coralModel.set_times(t)
     coralModel.set_start_conditions(start)
     coralModel.solve_time()
     coralModel.plot_through_time()
 
-    coralModel.set_parameter("theta", 0.21)
+    coralModel.set_start_conditions(start)
+    coralModel.set_parameters(theta=0.5)
     coralModel.solve_time()
     coralModel.plot_through_time()
     print(coralModel.model_name)
