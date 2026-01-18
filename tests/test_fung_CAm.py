@@ -10,16 +10,16 @@ import pytest
 import os
 import sys
 # make sure we use the devel version first
-sys.path.insert(0,"../src")
+sys.path.insert(0,"../src/reef_modeller")
 
 
-from fungCAm import *
+from fung import FungCAm
 
 class TestModelCollection:
     """Tests the model collection class"""
         
     def test_set_parameter(self):
-        coralModel=fungCAm()
+        coralModel=FungCAm()
         coralModel.set_parameter("theta" , 0.2)
         with pytest.raises(Exception):
             coralModel.set_parameter("theta", -0.21)

@@ -10,8 +10,8 @@ import pytest
 import os
 import sys
 # make sure we use the devel version first
-sys.path.insert(0,"../src")
-from mumby import *
+sys.path.insert(0,"../src/reef_modeller/")
+from mumby import Mumby
 
 class TestModelCollection():
         

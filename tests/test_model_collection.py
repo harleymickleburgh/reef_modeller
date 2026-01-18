@@ -2,9 +2,9 @@ import pytest
 import os
 import sys
 # make sure we use the devel version first
-sys.path.insert(0,"../src")
+sys.path.insert(0,"../src/reef_modeller/")
 
-from coral_ode_lab import *
+from CoralODELab import *
 
 class TestModelCollection():
 

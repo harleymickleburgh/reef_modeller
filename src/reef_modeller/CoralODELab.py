@@ -207,7 +207,7 @@ class CoralODELab:
         types = []
         # loop through param range
         for p in param_range:
-            self.set_parameter(parameter,p)
+            self.set_parameters(**{parameter: p})
             # find roots and remove unstable ones (saddles and stable)
             roots, type_root = self.find_eq_points()
             all_roots.append(roots)
@@ -225,7 +225,7 @@ class CoralODELab:
         #plt.ylim(0,1)
         plt.xlim(param_range[0], param_range[-1])
         plt.xlabel(parameter)
-        plt.ylabel('Coral cover')
+        plt.ylabel('% cover')
         plt.show()
 
 
@@ -236,7 +236,7 @@ class CoralODELab:
         # bounds will always be [0, 1] and can only sum to 1
         for coral in np.linspace(0.1,1,20):
             for algae in np.linspace(0.1, 1-coral-1e-6, 20-coral_counter):
-                start_conditions.append([coral,algae])
+                start_conditions.append([coral,algae/2,algae/2])
             
             coral_counter += 1
         
@@ -245,9 +245,9 @@ class CoralODELab:
         for init in start_conditions:
             # workout the stability points
             roots, infodict, ier, mesg = fsolve(self.ode, init, args=(0), full_output = True)
-            matrixr=np.zeros((2,2))                    # dim= number of linear equations
-            matrixr[np.triu_indices(2)]=infodict["r"]    # to unpack "r" into matrix
-            Jacobian=(infodict["fjac"].T).dot(matrixr)     # needs .T to get Q
+            matrixr=np.zeros((self.num_eq, self.num_eq))  # dim= number of linear equations
+            matrixr[np.triu_indices(self.num_eq)]=infodict["r"]     # to unpack "r" into matrix
+            Jacobian=(infodict["fjac"].T).dot(matrixr)    # needs .T to get Q
             if (np.isnan(Jacobian).any()):
                 stability.append(-1)
                 continue
@@ -324,28 +324,6 @@ class CoralODELab:
         plt.show()
         #self.plot_through_time()
 
-    def set_parameter(self,name,value):
-        """
-        Set a single parameter by name
-
-        :param name: name of the parameter to set
-        :type name: string
-        :param value: value of the parameter to set
-        :type value: float
-
-        """
-        # add check that the name is in the paramter set
-        try:
-            self.parameters[name]
-        except KeyError:
-            raise Exception("Parameter name is not in the options list. See docs")
-
-        self._check_value(value)
-
-        self.parameters[name] = value
-
-        #TODO if value not within range, fail ("value is outside range")
-
     def set_parameters(self,**updated_parameters):
         """
         Update multiple parameters at once.
@@ -354,8 +332,11 @@ class CoralODELab:
 
         for key, value in updated_parameters.items():
             if hasattr(self.p, key):
-                old_value = getattr(self.p, key)
-                setattr(self.p, key, value)
+                # check value:
+                if self.parameter_ranges[key][0] <= value <= self.parameter_ranges[key][1]:
+                    setattr(self.p, key, value)
+                else:
+                    print(f"Error: Parameter '{key}' has a value outside the range.")
             else:
                 print(f"Warning: Parameter '{key}' not found in model.")
 

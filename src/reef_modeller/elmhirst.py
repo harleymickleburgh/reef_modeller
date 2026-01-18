@@ -9,7 +9,7 @@ Created on Mon Jul 10 15:09:45 2023
 from reef_modeller.coral_ode_lab import *
 
 
-class elmhirst(CoralODELab):
+class Elmhirst(CoralODELab):
     def __init__(self):
         CoralODELab.__init__(self,"elmhirst")
         self.num_parameters = 7

@@ -10,14 +10,14 @@ import pytest
 import os
 import sys
 # make sure we use the devel version first
-sys.path.insert(0,"../src")
+sys.path.insert(0,"../src/reef_modeller/")
 
-from greiner import *
+from greiner import Greiner
 
 class TestModelCollection():
         
     def test_set_parameter(self):
-        coralModel=greiner()
+        coralModel=Greiner()
         coralModel.set_parameter("g", 0.21)
         with pytest.raises(Exception):
             coralModel.set_parameter("g", -0.21)

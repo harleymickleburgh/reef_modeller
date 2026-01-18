@@ -1,6 +1,4 @@
-from coral_ode_lab import *
-
-from scipy.optimize import fsolve
+from CoralODELab import *
 
 
 class Mumby(CoralODELab):
@@ -15,6 +13,7 @@ class Mumby(CoralODELab):
                 "r": 0.55,
                 "d": 0.24
                 }
+        self.p = SimpleNamespace(**self.parameters)        
         self.parameter_names = {
                 "a": "overgrowth",
                 "g": "grazing",
@@ -58,40 +57,4 @@ class Mumby(CoralODELab):
         
     
         return[dCdt, dMdt]
-
-       
-if __name__ == "__main__":
-    # only run if called as a script, not imported
-    start = [0.5, 0.5]
-    coralModel = Mumby()
-    coralModel.set_start_conditions(start)
-
-    coralModel.set_parameter("g",0.0)
-    eq = fsolve(coralModel.ode, start, args=(0))
-    print(eq)
-
-    coralModel.set_start_conditions(start)
-    coralModel.set_parameter("g",0.1)
-    eq = fsolve(coralModel.ode, start, args=(0))
-    print(eq)
-
-    coralModel.set_start_conditions(start)
-    coralModel.set_parameter("g",0.2)
-    eq = fsolve(coralModel.ode, start, args=(0))
-    print(eq)
-
-    coralModel.set_start_conditions(start)
-    coralModel.set_parameter("g",0.3)
-    eq = fsolve(coralModel.ode, start, args=(0))
-    print(eq)
-
-    coralModel.set_start_conditions(start)
-    coralModel.set_parameter("g",0.4)
-    eq = fsolve(coralModel.ode, start, args=(0))
-    print(eq)
-
-    coralModel.set_start_conditions(start)
-    coralModel.set_parameter("g",0.5)
-    eq = fsolve(coralModel.ode, start, args=(0))
-    print(eq)
 

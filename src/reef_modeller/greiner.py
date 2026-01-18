@@ -6,11 +6,11 @@ Created on Tue Jul  4 11:42:58 2023
 
 @author: kl909
 """
-from coral_ode_lab import *
+from CoralODELab import *
 
-class greiner(CoralODELab):
+class Greiner(CoralODELab):
     def __init__(self):
-        CoralODELab.__init__(self,"greiner")
+        CoralODELab.__init__(self,"Greiner")
         self.num_parameters = 9
         self.parameters = {
             "r" : 0.55,    # growth
