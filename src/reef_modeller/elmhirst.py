@@ -6,7 +6,9 @@ Created on Mon Jul 10 15:09:45 2023
 @author: kl909
 """
 
-from reef_modeller.coral_ode_lab import *
+from CoralODELab import CoralODELab
+from types import SimpleNamespace
+
 
 
 class Elmhirst(CoralODELab):
@@ -21,9 +23,8 @@ class Elmhirst(CoralODELab):
             "g" : 0.2,# grazing (use fung?)
             "y" : 0.77, # turf overgrowth
             "e" : 0.005, #algae recruitment
-            
-            
-            }
+        }
+        self.p = SimpleNamespace(**self.parameters) 
         self.parameter_names = {
             "r" : "growth",
             "d" : "mortality", # 0.02 - 1.0

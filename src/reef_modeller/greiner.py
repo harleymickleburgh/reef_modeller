@@ -6,7 +6,9 @@ Created on Tue Jul  4 11:42:58 2023
 
 @author: kl909
 """
-from CoralODELab import *
+from CoralODELab import CoralODELab
+from types import SimpleNamespace
+
 
 class Greiner(CoralODELab):
     def __init__(self):
@@ -22,8 +24,8 @@ class Greiner(CoralODELab):
             "lsc" : 0.00,  # external coral recruitment
             "mlbc" : 1.0,  # local algae recruitment
             "mlsc" : 0.00, # external algae recruitment
-            
             }
+        self.p = SimpleNamespace(**self.parameters) 
         self.parameter_names = {
             "r" : "growth",
             "d" : "mortality", # 0.02 - 1.0

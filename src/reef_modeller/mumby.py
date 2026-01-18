@@ -1,5 +1,5 @@
-from CoralODELab import *
-
+from CoralODELab import CoralODELab
+from types import SimpleNamespace
 
 class Mumby(CoralODELab):
 

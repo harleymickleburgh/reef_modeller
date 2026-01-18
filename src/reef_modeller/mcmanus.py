@@ -5,8 +5,8 @@ Created on Mon Jul  3 15:59:18 2023
 
 @author: kl909
 """
-
-from coral_ode_lab import *
+from CoralODELab import CoralODELab
+from types import SimpleNamespace
 
 class Mcmanus(CoralODELab):
     def __init__(self):
@@ -22,8 +22,8 @@ class Mcmanus(CoralODELab):
             "y" : 1.1, # turf overgrowth
             "w" : 0.005, # spawning larvae (use lsc from fung?)
             "time" : 0.5, #duration of external coral recruitment 0-1
-            
             }
+        self.p = SimpleNamespace(**self.parameters)         
         self.parameter_names = {
             "r" : "growth",
             "d" : "mortality", # 0.02 - 1.0

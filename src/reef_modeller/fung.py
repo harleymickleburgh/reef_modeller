@@ -6,9 +6,8 @@ Created on Tue Jul  4 11:56:24 2023
 @author: kl909
 """
 
-from CoralODELab import *
+from CoralODELab import CoralODELab
 from types import SimpleNamespace
-
 
 class FungCTMm(CoralODELab):
     def __init__(self):
