@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Jul  4 11:56:24 2023
-
-@author: kl909
-"""
 
 from CoralODELab import CoralODELab
 from types import SimpleNamespace
@@ -12,6 +7,7 @@ from types import SimpleNamespace
 class FungCTMm(CoralODELab):
     def __init__(self):
         CoralODELab.__init__(self,"fungCTMm")
+        self.num_eq = 3
         self.num_parameters = 14
         self.parameters = {
             "theta" : 0.2, #grazing pressure
@@ -49,7 +45,7 @@ class FungCTMm(CoralODELab):
             }
         
         self.parameter_ranges = {
-            "theta" : [0.2, 1], #grazing pressure
+            "theta" : [0, 1], #grazing pressure
             "dc" : [0.02, 0.1], #coral mortality rate (yr^-1)
             "lbc" : [0.0009, 0.5], #rate at which coral larvae, produced by local established brooding corals, recruit onto space (yr^-1)
             "lsc" : [0.00006, 0.01], #rate at which exogenus spawning coral larvae recruit onto space (yr^-1)
@@ -58,7 +54,7 @@ class FungCTMm(CoralODELab):
             "ac" : [0,1], #growth rate of corals over turf, relative to the rate over space
             "ec" : [0.05, 0.15], #recruitment rate of corals onto turf, relative to the rate onto space 
             "sT" : [2, 20], #growth rate of fine turf (occupying space) (yr^-1)
-            "gm" : [],
+            "gm" : [0, 1],
             "rm" : [0.05, 0.4],
             "bm" : [0.2, 0.9],
             "ymc" : [0, 0.9],
@@ -75,7 +71,7 @@ class FungCTMm(CoralODELab):
             coral: \frac{dC}{dt} = &\underbrace{(l^s_c + l^b_c C)(S+\varepsilon_c T)} _{Recruitment}   
     + \underbrace{r_c(1-\beta_MM)(S+\alpha_c T)C}_{Growth} 
     - \underbrace{d_c C}_{mortality} \nonumber\\
-   & - \underbrace{\gamma _{MC} r_m MC)}_{Macroalgae \, overgrowth}
+   & - \underbrace{\gamma_{MC} r_m MC)}_{Macroalgae \, overgrowth}
     
             macroalgae: \frac{dM}{dt} = \underbrace{r_M M(S+\gamma_{MC} C+ {\gamma_{MT}} T)}_{Macroalgal \, growth} - \underbrace{g_M \theta M}_{Grazing \, on \, \\ macroalgae} 
             
@@ -89,25 +85,25 @@ class FungCTMm(CoralODELab):
         T = z[1]
 
         #coral dC
-        recruitmentC = (self.p.lsc + self.p.lbc*C)*(S+self.p.ec*T)
-        growthC = self.p.rc*(1-self.p.bm*M)*(S+self.p.ac*T)*C
-        mortalityC = self.p.dc*C
-        MgrowthC = self.p.ymc*self.p.rm*M*C
+        recruitmentC = (self.p.lsc + self.p.lbc * C) * (S + self.p.ec * T)
+        growthC = self.p.rc * (1 - self.p.bm * M) * (S + self.p.ac * T) * C
+        mortalityC = self.p.dc * C
+        MgrowthC = self.p.ymc * self.p.rm * M * C
         
         dCdt = recruitmentC + growthC - mortalityC - MgrowthC
         
         #turf dT
-        growthT = self.p.sT*(1-self.p.theta)*S
-        grazingT = self.p.gT*self.p.theta*T
-        CrecrtuitmentT = self.p.ec*(self.p.lsc+self.p.lbc*C)*T #coral recruitment on turf
-        CgrowthT = self.p.ac*self.p.rc*(1-self.p.bm*M)*T*M #%coral growth over turf
-        MgrowthCT = self.p.ymt*self.p.rm*M*T
+        growthT = self.p.sT * (1 - self.p.theta) * S
+        grazingT = self.p.gT * self.p.theta * T
+        CrecrtuitmentT = self.p.ec * (self.p.lsc + self.p.lbc * C) * T # coral recruitment on turf
+        CgrowthT = self.p.ac * self.p.rc * (1 - self.p.bm * M) * T * C # coral growth over turf
+        MgrowthCT = self.p.ymt * self.p.rm * M * T
         
         dTdt = growthT - grazingT - CrecrtuitmentT - CgrowthT - MgrowthCT
         
         #macroalgae dM
-        growthM = self.p.rm*M*(S+self.p.ymc*C+self.p.ymt*T)
-        grazingM = self.p.gm*self.p.theta*M
+        growthM = self.p.rm * M * (S + self.p.ymc * C + self.p.ymt * T)
+        grazingM = self.p.gm * self.p.theta * M
         
         dMdt = growthM - grazingM
         
@@ -118,6 +114,7 @@ class FungCAm(CoralODELab):
     def __init__(self):
         CoralODELab.__init__(self,"fungCAm")
         self.num_parameters = 14
+        self.num_eq = 2
         self.parameters = {
             "theta" : 0.7, #grazing pressure
             "dc" : 0.02, #coral mortality rate (yr^-1)
@@ -133,8 +130,9 @@ class FungCAm(CoralODELab):
             "rm" : 0.35, #lateral growth rate of macroalgae over space
             "bm" : 0.9, #coral growth is inhibited by presence of nearbymacroalgae
             "ymc" : 0.1, #lateral growth rate of macroalgae over corals,relative to the rate over space
-            
             }
+        self.p = SimpleNamespace(**self.parameters)
+
         self.parameter_names = {
             "theta" : "grazing pressure",
             "dc" : "coral mortality rate (yr^-1)",
@@ -154,7 +152,7 @@ class FungCAm(CoralODELab):
             }
         
         self.parameter_ranges = {
-            "theta" : [0.4, 1], #grazing pressure
+            "theta" : [0.0, 1], #grazing pressure
             "dc" : [0.02, 0.1], #coral mortality rate (yr^-1)
             "lbc" : [0.0009, 0.5], #rate at which coral larvae, produced by local established brooding corals, recruit onto space (yr^-1)
             "lsc" : [0.00006, 0.01], #rate at which exogenus spawning coral larvae recruit onto space (yr^-1)
@@ -164,7 +162,7 @@ class FungCAm(CoralODELab):
             "ec" : [0.05, 0.15], #recruitment rate of corals onto turf, relative to the rate onto space 
             "sT" : [2, 20], #growth rate of fine turf (occupying space) (yr^-1)
             "vm" : [0, 1],
-            "gm" : [(0.1*5), (0.1*15)],
+            "gm" : [0.5, 1.5],
             "rm" : [0.05, 0.4],
             "bm" : [0.2, 0.9],
             "ymc" : [0, 0.9],
@@ -174,26 +172,28 @@ class FungCAm(CoralODELab):
                          reefs under anthropogenic stress. Ecology, 92(4), 967–982."
         
     def ode(self, z, t):
-        S = 1 - z[0] - z[1]
-        
-            #coral dC
-        recruitmentC = (self.parameters['lsc'] + self.parameters['lbc']*z[0]) * \
-                       (S+self.parameters['ec']*(1 - self.parameters['vm'])*z[1])
-        growthC = self.parameters['rc']*(1 - self.parameters['bm'] * self.parameters['vm'] * z[1]) * \
-                  (S + self.parameters['ac']*(1 -self.parameters['vm'])*z[1])*z[0]
-        mortalityC = self.parameters['dc']*z[0]
-        MgrowthC = self.parameters['ymc']*self.parameters['rm']*self.parameters['vm']*z[1]*z[0]
+        S = 1 - sum(z)
+        C = z[0]
+        A = z[1]
+
+        #coral dC
+        recruitmentC = (self.p.lsc + self.p.lbc * C) * \
+                       (S + self.p.ec * (1 - self.p.vm) * A)
+        growthC = self.p.rc * (1 - self.p.bm * self.p.vm * A) * \
+                  (S + self.p.ac * (1 -self.p.vm) * A) * C
+        mortalityC = self.p.dc * C
+        MgrowthC = self.p.ymc * self.p.rm * self.p.vm * A * C
         dCdt = recruitmentC + growthC - mortalityC - MgrowthC
         
         # algae dM
-        growthMA = self.parameters['rm']*self.parameters['vm']*z[1]*(S+self.parameters['ymc']*z[0])
-        growthT = self.parameters['sT']*(1-self.parameters['theta'])*S
-        grazingAT = (self.parameters['gm']*self.parameters['vm']+self.parameters['gT']*(1-self.parameters['vm']))*self.parameters['theta']*z[1]
-        CrecruitmentT = self.parameters['ec']*(1-self.parameters['vm'])*(self.parameters['lsc']+self.parameters['lbc']*z[0])*z[1]
-        CgrowthT = self.parameters['ac']*self.parameters['rc']*(1-self.parameters['vm'])*(1 - self.parameters['bm']*self.parameters['vm']*z[1])*z[1]*z[0] 
-        dMdt = growthMA + growthT - grazingAT - CrecruitmentT - CgrowthT
-        
-        return [dCdt, dMdt]
+        growthMA = self.p.rm * self.p.vm * A * (S + self.p.ymc * C)
+        growthT = self.p.sT * (1 - self.p.theta) * S
+        grazingAT = (self.p.gm * self.p.vm + self.p.gT * (1 - self.p.vm)) * self.p.theta * A
+        CrecruitmentT = self.p.ec * (1 - self.p.vm) * (self.p.lsc + self.p.lbc * C) * A
+        CgrowthT = self.p.ac * self.p.rc * (1 - self.p.vm) * (1 - self.p.bm * self.p.vm * A) * A * C 
+        dAdt = growthMA + growthT - grazingAT - CrecruitmentT - CgrowthT
+ 
+        return [dCdt, dAdt]
             
 if __name__ == "__main__":
     # only run if called as a script, not imported

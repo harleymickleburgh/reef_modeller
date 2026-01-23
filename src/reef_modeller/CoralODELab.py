@@ -324,19 +324,25 @@ class CoralODELab:
         plt.show()
         #self.plot_through_time()
 
-    def set_parameters(self,**updated_parameters):
+    def set_parameters(self, new_params=None, **kwargs):
         """
-        Update multiple parameters at once.
-        Usage: model.set_parameters(rc=0.8, theta=0.2)
+        Update parameters via a dictionary or keyword arguments.
+        Usage: 
+            model.set_parameters({'rc': 0.8})
+            model.set_parameters(rc=0.8, theta=0.2)
         """
+        # Combine dictionary and keyword arguments
+        # note keyword arguments "win"
+        updates = new_params if isinstance(new_params, dict) else {}
+        updates.update(kwargs)
 
-        for key, value in updated_parameters.items():
+        # now update
+        for key, value in updates.items():
             if hasattr(self.p, key):
                 # check value:
-                if self.parameter_ranges[key][0] <= value <= self.parameter_ranges[key][1]:
-                    setattr(self.p, key, value)
-                else:
-                    print(f"Error: Parameter '{key}' has a value outside the range.")
+                if not self.parameter_ranges[key][0] <= value <= self.parameter_ranges[key][1]:
+                    print(f"Warning: Parameter '{key}' has a value outside the range. Setting anyway")
+                setattr(self.p, key, value)
             else:
                 print(f"Warning: Parameter '{key}' not found in model.")
 
