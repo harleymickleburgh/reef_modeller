@@ -42,9 +42,9 @@ class Elmhirst(CoralODELab):
         r"""
         setting up equations for Elmhirst et al. 2009
         .. math::
-            turf: T = 1 - z[0] - z[1]
+            turf: T = 1 - M - C
             coral: \frac{dC}{dt} = g(M,C) = \underbrace{C(rT)}_{growth} - \underbrace{dC}_{mortality} - \underbrace{\alpha MC}_{overgrowth \, by \, M} + \underbrace{\zeta T}_{recruitment}
-            macroalgae: \frac{dM}{dt} = f(M,C) = \underbrace{\alpha MC}_{M \, overgrowing \, C} + \underbrace{M(\frac{g}{C-1}}_{grazing} + \underbrace{\gamma T)}_{M \, overgrows \, T} + \underbrace{\epsilon T}_{recruitment}
+            macroalgae: \frac{dM}{dt} = f(M,C) = \underbrace{\alpha MC}_{M \, overgrowing \, C} - \underbrace{M(\frac{g}{M + T}_{grazing} + \underbrace{\gamma T)}_{M \, overgrows \, T} + \underbrace{\epsilon T}_{recruitment}
 
         """
         T = 1 - sum(z)
@@ -58,10 +58,11 @@ class Elmhirst(CoralODELab):
         dCdt = growth - mortality - overgrowthM + recruitment
         
         movergrowingC = self.p.a * M * C
-        grazing = M * (self.p.g / (C - 1)) 
+        grazing = M * (self.p.g / (M + T)) 
         MovergrowsT = self.p.y * M * T
         Mrecruitment = self.p.e * T
-        dMdt = movergrowingC + grazing + MovergrowsT + Mrecruitment
+        dMdt = movergrowingC - grazing + MovergrowsT + Mrecruitment
+        print(movergrowingC,grazing,MovergrowsT,Mrecruitment)
         
         return[ dCdt, dMdt]
      
