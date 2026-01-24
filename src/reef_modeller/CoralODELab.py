@@ -39,6 +39,7 @@ class CoralODELab:
         self.start_conditions = []
         self.parameters = {}
         self.num_parameters = 0
+        self.num_eq = 0
         self.citation = ""
         self.parameter_names = {}
         self.parameter_range = {}

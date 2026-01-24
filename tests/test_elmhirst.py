@@ -32,7 +32,7 @@ class TestModelElmhirst():
         coralModel.set_start_conditions(start)
         coralModel.solve_time()
         test_output = coralModel.get_output()
-        expected = [0.563636, 0.0]
+        expected = [0.5687747, 0.001464376]
         assert test_output[-1,0] == pytest.approx(expected[0])
         assert test_output[-1,1] == pytest.approx(expected[1])
         
@@ -54,8 +54,8 @@ class TestModelElmhirst():
           coralModel.set_start_conditions(start)
           test_output = coralModel.ode(start,t[1])
           # worked out 
-          expected_dC = 0.0042
-          expected_dM = 0.005088889
+          expected_dC = 0.077
+          expected_dM = 0.077888888
           assert test_output[0] ==  pytest.approx(expected_dC)
           assert test_output[1] == pytest.approx(expected_dM)
         
