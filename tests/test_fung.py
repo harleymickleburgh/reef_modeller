@@ -104,7 +104,6 @@ class TestFungModels:
           coralModel = FungCAm()
           coralModel.set_times(t)
           coralModel.set_parameters(parameters)
-          print(coralModel.parameters)
           coralModel.set_start_conditions(start)
           test_output = coralModel.ode(start,t[1])
           # worked out 

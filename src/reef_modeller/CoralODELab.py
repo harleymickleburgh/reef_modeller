@@ -1,12 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-"""
-A collection of ODE reef models based on coral and algae interactions.
-
-@author: kl909, jh1889
-"""
-
 from scipy.integrate import odeint
 import numpy as np
 import matplotlib.pyplot as plt

@@ -1,18 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-
-Created on Tue Jul  4 11:42:58 2023
-
-@author: kl909
-"""
 from CoralODELab import CoralODELab
 from types import SimpleNamespace
-
 
 class Greiner(CoralODELab):
     def __init__(self):
         CoralODELab.__init__(self,"Greiner")
+        self.num_eq = 2
         self.num_parameters = 9
         self.parameters = {
             "r" : 0.55,    # growth
@@ -66,30 +60,32 @@ class Greiner(CoralODELab):
             
             """
         
-        T = 1 - z[0] - z[1]
-        # coral z[0]
+        T = 1 - sum(z)
+        C = z[0]
+        M = z[1]
+
         # this is internal recruitment, aka brooding corals
-        growth = self.parameters['r']*self.parameters['lbc']*T*z[0]
-        mortalityC = self.parameters['d']*z[0]
-        Movergrowth = self.parameters['a']*z[1]*z[0]
-        # External recruitment: note lsc term needs multiplying by z[0] outside here
+        growth = self.p.r * self.p.lbc * T * C
+        mortalityC = self.p.d * C
+        Movergrowth = self.p.a * M * C
+        # External recruitment: note lsc term needs multiplying by C outside here
         # this includes self-seeding from floating gametes/larvae
         # that means the parameter lsc is actually the connectivity matrix x current C
-        recruitment = self.parameters['r']*self.parameters['lsc']*T
+        recruitment = self.p.r * self.p.lsc * T
         dCdt = growth - mortalityC - Movergrowth + recruitment
        
         # macroalgae (z(1))
-        MMovergrowth = self.parameters['a']*z[1]*z[0]
-        if -1e-8 < z[1]+T < 1e-8:
-            grazing = 0
+        MMovergrowth = self.p.a * M * C
+        if -1e-8 < M + T < 1e-8:
+            grazing = 0 # or we get a divide by zero...
         else:
-            grazing = (self.parameters['g']*z[1])/(z[1]+T)
+            grazing = (self.p.g * M) / (M + T)
         # this is internal recruitment, aka growth
-        growthM1 = self.parameters['y']*(self.parameters['mlbc'])*z[1]*T
+        growthM1 = self.p.y * self.p.mlbc * M * T
         # External recruitment: note mlsc term need multiplying by z[1] outside here
         # that means the parameter mlsc is actually the connectivity matrix x current M
         # this includes self-seeding recruitment from floating gametes
-        growthM2 = self.parameters['y']*self.parameters['mlsc']*T
+        growthM2 = self.p.y * self.p.mlsc * T
         dMdt = MMovergrowth - grazing + growthM1 + growthM2
        
         return[dCdt, dMdt]

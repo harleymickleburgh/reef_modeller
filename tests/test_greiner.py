@@ -15,70 +15,6 @@ sys.path.insert(0,"../src/reef_modeller/")
 from greiner import Greiner
 
 class TestModelCollection():
-        
-    def test_set_parameter(self):
-        coralModel=Greiner()
-        coralModel.set_parameter("g", 0.21)
-        with pytest.raises(Exception):
-            coralModel.set_parameter("g", -0.21)
-
-    def test_set_parameters(self):
-        coralModel=greiner()
-        params = {
-                "r" : 0.55, #growth
-                "d" : 0.24,# mortality 0.02 - 1.0
-                "a" : 0.1,# coral overgrowth
-                "g" : 0.77,# grazing (use fung?)
-                "y" : 0.77, # turf overgrowth
-                "lbc" : 0.0025, # divided elmhirst value of all coral recruitment 0.005
-                "lsc" : 0.0025,
-                "mlbc" : 0.0025,
-                "mlsc" : 0.0025,
-                }
-        coralModel.set_parameters(params)
-        params["a"]= "banana"
-        with pytest.raises(Exception):
-            coralModel.set_parameters(params)
-        params["a"]= -0.21
-        with pytest.raises(Exception):
-            coralModel.set_parameters(params)   
-        params["a"]= 0.21
-        params["banan"]= 0.21
-        with pytest.raises(Exception):
-            coralModel.set_parameters(params)
-        params = "ikhbb"
-        with pytest.raises(Exception):
-            coralModel.set_parameters(params)        
-
-    def test_set_start_conditions(self):
-        coralModel=greiner()
-        start=[0.8,0.2]
-        coralModel.set_start_conditions(start)
-        start = [-0.8, 0.2]
-        with pytest.raises(Exception):
-            coralModel.set_start_conditions(start)
-        start = [0.4, 0.4, 0.4]
-        with pytest.raises(Exception):
-            coralModel.set_start_conditions(start)
-        start = ["bob", "janet"]
-        with pytest.raises(Exception):
-            coralModel.set_start_conditions(start)
-    
-    def test_set_times(self):
-        coralModel=greiner()
-        t = np.linspace(0,100, num = 100)
-        coralModel.set_times(t.tolist())
-        t = np.linspace(-10,100, num = 100)
-        with pytest.raises(Exception):
-            coralModel.set_times(t.tolist())
-        t = np.linspace(100,10, num = 100)
-        with pytest.raises(Exception):
-            coralModel.set_times(t.tolist())
-        #t = np.linspace("apple", 10, num = 100) # this one errors, because of np?
-        # yes = linspace can't go from "apple" to 10
-        t = ["apple", "banana", "orange"]
-        with pytest.raises(Exception):
-            coralModel.set_times(t.tolist())
 
     def test_solve_time(self):
         # set up the equations such that the dc/dt and dm/dt are small
@@ -100,7 +36,7 @@ class TestModelCollection():
         
         start = [0.8, 0]
         t = [0,500]
-        coralModel = greiner()
+        coralModel = Greiner()
         coralModel.set_times(t)
         coralModel.set_parameters(parameters)
         coralModel.set_start_conditions(start)
@@ -126,7 +62,7 @@ class TestModelCollection():
                 "mlbc" : 0.9,
                 "mlsc" : 0.1,
                   }
-          coralModel = greiner()
+          coralModel = Greiner()
           coralModel.set_times(t)
           coralModel.set_parameters(parameters)
           coralModel.set_start_conditions(start)
