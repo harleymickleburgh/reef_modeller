@@ -14,7 +14,7 @@ sys.path.insert(0,"../src/reef_modeller/")
 
 from greiner import Greiner
 
-class TestModelCollection():
+class TestModelGreiner():
 
     def test_solve_time(self):
         # set up the equations such that the dc/dt and dm/dt are small

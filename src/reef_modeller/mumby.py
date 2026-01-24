@@ -6,6 +6,7 @@ class Mumby(CoralODELab):
     def __init__(self):
         CoralODELab.__init__(self,"Mumby")
         self.num_parameters = 5
+        self.num_eq = 2
         self.parameters = {
                 "a": 0.1,
                 "g": 0.3,
@@ -41,18 +42,20 @@ class Mumby(CoralODELab):
        
        
            """
-        T = 1 - z[0] - z[1]
+        T = 1 - sum(z)
+        C = z[0]
+        M = z[1]
          
-        #coral (z(1))
-        recruitmentC = self.parameters['r']*T*z[0]
-        mortalityC = self.parameters['d']*z[0]
-        Movergrowth = self.parameters['a']*z[1]*z[0]
+        #coral
+        recruitmentC = self.p.r * T * C
+        mortalityC = self.p.d * C
+        Movergrowth = self.p.a * M * C
         dCdt = recruitmentC - mortalityC - Movergrowth
         
-        # macroalgae (z(2))
-        MMovergrowth = self.parameters['a']*z[1]*z[0]
-        grazing = (self.parameters['g']*z[1]) / (z[1] + T)
-        growthM = self.parameters['y']*z[1]*T
+        # macroalgae
+        MMovergrowth = self.p.a * M * C
+        grazing = (self.p.g * M) / (M + T)
+        growthM = self.p.y * M * T
         dMdt = MMovergrowth - grazing + growthM
         
     
