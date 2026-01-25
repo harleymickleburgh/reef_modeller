@@ -13,7 +13,7 @@ class Elmhirst(CoralODELab):
             "d" : 0.24,# mortality 0.02 - 1.0
             "a" : 0.1,# coral overgrowth
             "s" : 0.005, #coral recruitment
-            "g" : 0.2,# grazing (use fung?)
+            "g" : 0.2,# grazing. beta in paper
             "y" : 0.77, # turf overgrowth
             "e" : 0.005, #algae recruitment
         }
@@ -62,7 +62,6 @@ class Elmhirst(CoralODELab):
         MovergrowsT = self.p.y * M * T
         Mrecruitment = self.p.e * T
         dMdt = movergrowingC - grazing + MovergrowsT + Mrecruitment
-        print(movergrowingC,grazing,MovergrowsT,Mrecruitment)
         
         return[ dCdt, dMdt]
      

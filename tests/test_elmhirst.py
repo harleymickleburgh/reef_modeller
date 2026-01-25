@@ -18,10 +18,10 @@ class TestModelElmhirst():
                 "r" : 0.55, #growth
                 "d" : 0.24,# mortality 0.02 - 1.0
                 "a" : 0.1,# coral overgrowth
-                "g" : 0.8,# grazing (use fung?)
+                "g" : 0.4,# grazing (use fung?)
                 "y" : 0.77, # turf overgrowth
-                "s" : 0.005,
-                "e" : 0.005
+                "s" : 0.0,
+                "e" : 0.0
                 }
         
         start = [0.8, 0]
@@ -32,7 +32,7 @@ class TestModelElmhirst():
         coralModel.set_start_conditions(start)
         coralModel.solve_time()
         test_output = coralModel.get_output()
-        expected = [0.5687747, 0.001464376]
+        expected = [0.5636363636, 0.0]
         assert test_output[-1,0] == pytest.approx(expected[0])
         assert test_output[-1,1] == pytest.approx(expected[1])
         
