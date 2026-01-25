@@ -43,7 +43,7 @@ class FungCTMm(CoralODELab):
             "ymt" : "lateral growth rate of macroalgae over turf, relative to the rate over space" 
             }
         
-        self.parameter_ranges = {
+        self.parameter_range = {
             "theta" : [0, 1], #grazing pressure
             "dc" : [0.02, 0.1], #coral mortality rate (yr^-1)
             "lbc" : [0.0009, 0.5], #rate at which coral larvae, produced by local established brooding corals, recruit onto space (yr^-1)
@@ -150,7 +150,7 @@ class FungCAm(CoralODELab):
             
             }
         
-        self.parameter_ranges = {
+        self.parameter_range = {
             "theta" : [0.0, 1], #grazing pressure
             "dc" : [0.02, 0.1], #coral mortality rate (yr^-1)
             "lbc" : [0.0009, 0.5], #rate at which coral larvae, produced by local established brooding corals, recruit onto space (yr^-1)

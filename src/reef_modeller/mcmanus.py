@@ -35,7 +35,7 @@ class Mcmanus(CoralODELab):
             "w" : "spawning larvae (use lsc from fung?)",
             "time" : "duration of external coral recruitment",# 0-1
             }
-        self.parameter_ranges = {
+        self.parameter_range = {
             
             }
         self.citation = "McManus, L. C., Watson, J. R., Vasconcelos, V. V., & Levin, S. A. (2019). Stability and recovery of coral-algae systems: the importance of recruitment seasonality and grazing influence. Theoretical Ecology, 12(1), 61-72."

@@ -17,6 +17,7 @@ class TestModelCollection():
     
     def test_set_start_conditions(self):
         model = CoralODELab("test")
+        model.num_eq = 2
         model.set_start_conditions([0,1])
             
     def test_plot_through_time(self):

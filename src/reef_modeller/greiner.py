@@ -32,7 +32,7 @@ class Greiner(CoralODELab):
             "mlsc" : "external algae recruitment",
            
             }
-        self.parameter_ranges = {
+        self.parameter_range = {
             "r" : [0.55,0.55],  # growth
             "d" : [0.24,0.24],  # mortality 0.02 - 1.0
             "a" : [0.1,0.1],    # coral overgrowth

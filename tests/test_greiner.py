@@ -9,10 +9,7 @@ Created on Thu Jul 13 11:15:03 2023
 import pytest
 import os
 import sys
-# make sure we use the devel version first
-sys.path.insert(0,"../src/reef_modeller/")
-
-from greiner import Greiner
+from reef_modeller.greiner import Greiner
 
 class TestModelGreiner():
 

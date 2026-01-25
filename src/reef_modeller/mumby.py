@@ -22,7 +22,7 @@ class Mumby(CoralODELab):
                 "r": "recruitment, coral",
                 "d": "mortatility, coral"
                 }
-        self.parameter_ranges = {
+        self.parameter_range = {
                 "a": [0.01, 0.5],
                 "g": [0.001, 0.5],
                 "y": [0.1, 1],

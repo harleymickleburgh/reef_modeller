@@ -3,11 +3,8 @@
 import pytest
 import os
 import sys
-# make sure we use the devel version first
-sys.path.insert(0,"../src/reef_modeller")
-
-from fung import FungCTMm
-from fung import FungCAm
+from reef_modeller.fung import FungCTMm
+from reef_modeller.fung import FungCAm
 
 class TestFungModels:
             

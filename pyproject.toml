@@ -4,6 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "reef_modeller"
+license = {text = "CC-BY-SA-4.0"}
 version = "2026.01rc1"
 dependencies = [
 "matplotlib>=3.6.3",
