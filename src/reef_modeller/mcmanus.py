@@ -5,7 +5,7 @@ Created on Mon Jul  3 15:59:18 2023
 
 @author: kl909
 """
-from CoralODELab import CoralODELab
+from .CoralODELab import CoralODELab
 from types import SimpleNamespace
 
 class Mcmanus(CoralODELab):
@@ -63,22 +63,3 @@ class Mcmanus(CoralODELab):
         dMdt = mmovergrowsc - grazing + movergrowst
        
         return[dCdt, dMdt]
-    
-if __name__ == "__main__":
-    # only run if called as a script, not imported
-    start = [0.8, 0.2]
-    t = np.linspace(0,100, num = 100)
-    coralModel = Mcmanus()
-    coralModel.set_times(t)
-    coralModel.set_start_conditions(start)
-    coralModel.solve_time()
-    coralModel.plot_through_time()
-
-
-    coralModel.set_parameter("g", 0.21)
-    coralModel.solve_time()
-    coralModel.plot_through_time()
-    print(coralModel.model_name)
-    print(coralModel.citation)
-        
-

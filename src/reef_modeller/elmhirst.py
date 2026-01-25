@@ -4,7 +4,7 @@
 Coral-Algae ODE model based no Elmhirst et al 2009
 """
 from types import SimpleNamespace
-from CoralODELab import CoralODELab
+from .CoralODELab import CoralODELab
 
 class Elmhirst(CoralODELab):
     """

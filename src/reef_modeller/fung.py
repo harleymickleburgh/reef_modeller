@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-from CoralODELab import CoralODELab
 from types import SimpleNamespace
+from .CoralODELab import CoralODELab
 
 class FungCTMm(CoralODELab):
     def __init__(self):
@@ -194,36 +193,3 @@ class FungCAm(CoralODELab):
         dAdt = growthMA + growthT - grazingAT - CrecruitmentT - CgrowthT
  
         return [dCdt, dAdt]
-            
-if __name__ == "__main__":
-    # only run if called as a script, not imported
-    start = [0.1, 0.6]
-    coralModel = fungCAm()
-    coralModel.set_start_conditions(start)
-
-    import numpy as np
-    import matplotlib.pyplot as plt
-    from scipy.optimize import fsolve
-
-
-    thetas = []
-    corals = []
-    algae = []
-    for theta in np.arange(0.2, 0.71, 0.01):
-        coralModel.set_start_conditions(start)        
-        coralModel.set_parameter("theta",theta)
-        eq = fsolve(coralModel.ode, start, args=(0))
-        thetas.append(theta)
-        corals.append(eq[0])
-        algae.append(eq[1])
-        
-
-    fig, ax = plt.subplots()
-    ax.plot(thetas, corals, label="Coral", color=coralModel._coral_colour)
-    ax.plot(thetas, algae, label="Algae", color=coralModel._malgae_colour)
-
-
-    ax.set(xlabel='Grazing', ylabel='Perc Cover')
-    ax.grid()
-
-    plt.show()
