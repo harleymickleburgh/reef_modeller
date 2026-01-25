@@ -4,7 +4,7 @@ import sys
 # make sure we use the devel version first
 sys.path.insert(0,"../src/reef_modeller/")
 
-from CoralODELab import *
+from reef_modeller.CoralODELab import *
 
 class TestModelCollection():
 
