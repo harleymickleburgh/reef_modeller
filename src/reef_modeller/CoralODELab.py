@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from scipy.integrate import odeint
+"""This class is the underlaying class for all ODE models
+   It has the minimum params, etc set and functions to solve and
+   plot data
+"""
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.integrate import odeint
 from scipy.optimize import fsolve
 
-class CoralODELab:
+class CoralODELab: # pylint: disable=invalid-name
     """This is a top-level class to use as an inherit class for all other models. We use it
     to solve ODE sets to describe the interactions of coral-algae on reefs. 
 
@@ -46,6 +50,7 @@ class CoralODELab:
         self.coral_cover = 0
         self.macroalgae_cover = 0
         self.turfalgae_cover = 0
+        self.p = False
 
         # internal variables
         self._coral_colour  = "#F88379"
@@ -58,24 +63,22 @@ class CoralODELab:
 
         if isinstance(number,list):
             for l in number:
-                if not (isinstance(l,float) or isinstance(l,int)):
-                    raise Exception("Value entered in list is not an integer or float")
+                if not isinstance(l, (float, int)):
+                    raise TypeError("Value entered in list is not an integer or float")
                 if l < 0:
-                    raise Exception("Value entered in list is negative, \
+                    raise ValueError("Value entered in list is negative, \
                                     please insert positive number")
-        elif isinstance(number,float) or isinstance(number,int):
+        elif isinstance(number, (float, int)):
             if number < 0:
-                raise Exception("Value entered is negative, please insert positive number")
+                raise ValueError("Value entered is negative, please insert positive number")
         else:
-            raise Exception("Value entered is not an integer or float")
+            raise TypeError("Value entered is not an integer or float")
 
 
-    def _check_length(self, my_list, expected_length, exact=False):
+    def _check_length(self, my_list, expected_length):
 
-        if (not exact and len(my_list)<expected_length):
-            raise Exception("Entered wrong number of parameters") # jon check
-        if (exact and not len(my_list) == expected_length):
-            raise Exception("Entered wrong number of parameters") # jon check
+        if len(my_list) != expected_length:
+            raise TypeError("Entered wrong number of parameters")
 
 
     # this forces you to create an ode function
@@ -96,7 +99,7 @@ class CoralODELab:
         
         """
 
-        raise Exception("Not Implemented")
+        raise NotImplementedError
 
     def set_times(self,times):
         """
@@ -111,7 +114,7 @@ class CoralODELab:
         self._check_length(times,2)
         self._check_value(times)
         if not sorted(times) == times:
-            raise Exception("Times should be in ascending order")
+            raise ValueError("Times should be in ascending order")
 
         self.times = np.arange(times[0], times[1]+1, 1)
 
@@ -125,14 +128,11 @@ class CoralODELab:
         
         """
 
-        if self.num_eq == 3:
-            self._check_length(start_conditions,3,exact=True)
-        else:
-            self._check_length(start_conditions,2,exact=True)
+        self._check_length(start_conditions,self.num_eq)
         self._check_value(start_conditions)
 
         if sum(start_conditions) > 1:
-            raise Exception("Sum of starting conditions should be between 0 and 1")
+            raise ValueError("Sum of starting conditions should be between 0 and 1")
 
         self.start_conditions = start_conditions
         self.coral_cover = start_conditions[0]
@@ -193,9 +193,14 @@ class CoralODELab:
             pass
 
     def plot_bifurcation(self, parameter):
+        """
+        Create a bifurcation plot, with coral on the y axis 
+        and the parameter on the x axis. 
+        """
 
         # get parameter range
-        param_range = np.linspace(self.parameter_ranges[parameter][0], self.parameter_ranges[parameter][1], 151)
+        param_range = np.linspace(self.parameter_range[parameter][0],
+                                  self.parameter_range[parameter][1], 151)
 
         all_roots = []
         types = []
@@ -206,7 +211,7 @@ class CoralODELab:
             roots, type_root = self.find_eq_points()
             all_roots.append(roots)
             types.append(type_root)
-        
+
         # will have to plot as points
         for rr, tr, p in zip(all_roots, types, param_range):
             for r, t in zip(rr, tr):
@@ -224,25 +229,30 @@ class CoralODELab:
 
 
     def find_eq_points(self):
+        """
+        find the location of the equilibirum points in phase space.
+        These can be unstable or stable saddle points in the phase plot
+        """
         coral_counter = 0
         start_conditions = []
-        # create set of starting conditions        
+        # create set of starting conditions
         # bounds will always be [0, 1] and can only sum to 1
         for coral in np.linspace(0.1,1,20):
             for algae in np.linspace(0.1, 1-coral-1e-6, 20-coral_counter):
                 start_conditions.append([coral,algae/2,algae/2])
-            
             coral_counter += 1
-        
+
         all_roots = []
         stability = []
         for init in start_conditions:
             # workout the stability points
             roots, infodict, ier, mesg = fsolve(self.ode, init, args=(0), full_output = True)
+            if ier not in [1, 2, 3, 4]:
+                raise RuntimeError(f"Solver failed with message: {mesg}")
             matrixr=np.zeros((self.num_eq, self.num_eq))  # dim= number of linear equations
-            matrixr[np.triu_indices(self.num_eq)]=infodict["r"]     # to unpack "r" into matrix
-            Jacobian=(infodict["fjac"].T).dot(matrixr)    # needs .T to get Q
-            if (np.isnan(Jacobian).any()):
+            matrixr[np.triu_indices(self.num_eq)]=infodict["r"]  # to unpack "r" into matrix
+            Jacobian=(infodict["fjac"].T).dot(matrixr) # needs .T to get Q
+            if np.isnan(Jacobian).any():
                 stability.append(-1)
                 continue
             eigenvalues=np.array(np.linalg.eigvals(Jacobian))
@@ -260,7 +270,7 @@ class CoralODELab:
                     stability.append(1)
                 else:
                     stability.append(0)
-            
+
         all_roots = np.array(all_roots)
         # make small numbers zero in the roots
         tol = 1e-10
@@ -279,18 +289,20 @@ class CoralODELab:
             root_stability_type.append(stab_for_root)
 
         return(unique_roots, root_stability_type)
-        
 
     def plot_phase_space(self):
+        """
+        Plot the phase space of coral and algae. Arrows show the direction
+        of the phase space. Points indicate saddle points
+        """
 
         coral_counter = 0
         start_conditions = []
-        # create set of starting conditions        
+        # create set of starting conditions
         # bounds will always be [0, 1] and can only sum to 1
         for coral in np.linspace(0.1,1,20):
             for algae in np.linspace(0.1, 1-coral-1e-6, 20-coral_counter):
                 start_conditions.append([coral,algae])
-            
             coral_counter += 1
 
         # solve for 100 years and create solution
@@ -299,10 +311,11 @@ class CoralODELab:
         sol=[ self.solve_time(start=init) for init in start_conditions]
         for solution in sol:
             plt.plot(solution[:,0], solution[:,1],"k",alpha=0.5,linewidth=0.5)
-            plt.arrow(solution[1,0], solution[1,1], 
-                      dx*(solution[2,0]-solution[1,0]), 
-                      dx*(solution[2,1]-solution[1,1]), 
-                      shape='full', lw=0, color="k", alpha=0.5, length_includes_head=True, head_width=.015)
+            plt.arrow(solution[1,0], solution[1,1],
+                      dx*(solution[2,0]-solution[1,0]),
+                      dx*(solution[2,1]-solution[1,1]),
+                      shape='full', lw=0, color="k", alpha=0.5,
+                      length_includes_head=True, head_width=.015)
         roots, type_root = self.find_eq_points()
         for rr, tr in zip(roots, type_root):
             if tr == -1:
@@ -316,7 +329,6 @@ class CoralODELab:
         plt.xlabel('Coral')
         plt.ylabel('Algae')
         plt.show()
-        #self.plot_through_time()
 
     def set_parameters(self, new_params=None, **kwargs):
         """
@@ -334,11 +346,15 @@ class CoralODELab:
         for key, value in updates.items():
             if hasattr(self.p, key):
                 # check value:
-                if not self.parameter_ranges[key][0] <= value <= self.parameter_ranges[key][1]:
-                    print(f"Warning: Parameter '{key}' has a value outside the range. Setting anyway")
+                if not self.parameter_range[key][0] <= value <= self.parameter_range[key][1]:
+                    print(f"Warning: Parameter '{key}' has a value outside the range. \
+                            Setting anyway")
                 setattr(self.p, key, value)
             else:
                 print(f"Warning: Parameter '{key}' not found in model.")
 
     def get_output(self):
+        """
+        Return the output from the model
+        """
         return self.output
