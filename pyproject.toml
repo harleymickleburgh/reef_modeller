@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "reef_modeller"
-version = "2026_01"
+version = "2026.01rc1"
 dependencies = [
 "matplotlib>=3.6.3",
 "numpy>=2.4.1",
