@@ -9,7 +9,7 @@ class FungCTMm(CoralODELab):
         self.num_eq = 3
         self.num_parameters = 14
         self.parameters = {
-            "theta" : 0.2, #grazing pressure
+            "theta" : 0.7, #grazing pressure
             "dc" : 0.05, #coral mortality rate (yr^-1)
             "lbc" : 0.0009, #rate at which coral larvae, produced by local established brooding corals, recruit onto space (yr^-1)
             "lsc" : 0.00006, #rate at which exogenus spawning coral larvae recruit onto space (yr^-1)

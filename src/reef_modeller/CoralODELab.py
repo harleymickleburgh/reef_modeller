@@ -289,7 +289,8 @@ class CoralODELab: # pylint: disable=invalid-name
                     Jacobian = (infodict["fjac"].T).dot(matrix_r)
                     
                     if not np.isnan(Jacobian).any():
-                        label = classify_stability(eigenvalues)
+                        eigenvalues = np.linalg.eigvals(Jacobian)
+                        label = self.classify_stability(eigenvalues)
                         all_roots.append(roots)
                         stability.append(label)                        
         
@@ -309,45 +310,70 @@ class CoralODELab: # pylint: disable=invalid-name
         return unique_roots, unique_stability
 
 
-
-    def plot_phase_space(self):
+    def plot_phase_space(self, grid_density=6, t_end=100):
         """
-        Plot the phase space of coral and algae. Arrows show the direction
-        of the phase space. Points indicate saddle points
+        Plots trajectories from various starting points and overlays equilibrium points.
+        Works for 2D or 3D (as a 2D projection or 3D plot).
         """
+        import matplotlib.pyplot as plt
+        from itertools import product
 
-        coral_counter = 0
-        start_conditions = []
-        # create set of starting conditions
-        # bounds will always be [0, 1] and can only sum to 1
-        for coral in np.linspace(0.1,1,20):
-            for algae in np.linspace(0.1, 1-coral-1e-6, 20-coral_counter):
-                start_conditions.append([coral,algae])
-            coral_counter += 1
+        # 1. Setup Plot (2D vs 3D)
+        fig = plt.figure(figsize=(10, 8))
+        is_3d = self.num_eq == 3
+        ax = fig.add_subplot(111, projection='3d' if is_3d else None)
 
-        # solve for 100 years and create solution
-        self.set_times([0, 100])
-        dx = 0.001
-        sol=[ self.solve_time(start=init) for init in start_conditions]
-        for solution in sol:
-            plt.plot(solution[:,0], solution[:,1],"k",alpha=0.5,linewidth=0.5)
-            plt.arrow(solution[1,0], solution[1,1],
-                      dx*(solution[2,0]-solution[1,0]),
-                      dx*(solution[2,1]-solution[1,1]),
-                      shape='full', lw=0, color="k", alpha=0.5,
-                      length_includes_head=True, head_width=.015)
-        roots, type_root = self.find_eq_points()
-        for rr, tr in zip(roots, type_root):
-            if tr == -1:
-                plt.plot(rr[0], rr[1], 'or', markersize=7)
-            elif tr == 0:
-                plt.plot(rr[0], rr[1], 'ob', markersize=7)
+        # 2. Generate Starting Conditions (Simplex-aware)
+        axis = np.linspace(0.1, 0.9, grid_density)
+        start_conditions = [p for p in product(axis, repeat=self.num_eq) if sum(p) <= 1.0]
+
+        # 3. Solve and Plot Trajectories
+        t_span = np.linspace(0, t_end, 500)
+        for init in start_conditions:
+            sol = odeint(self.ode, init, t_span)
+            
+            if is_3d:
+                ax.plot(sol[:, 0], sol[:, 1], sol[:, 2], "k", alpha=0.3, lw=0.5)
+                # Add a small arrow/marker at the start to show direction
+                ax.scatter(sol[0,0], sol[0,1], sol[0,2], color='k', s=2, alpha=0.3)
             else:
-                plt.plot(rr[0], rr[1], 'om', markersize=7)
-        plt.ylim(0,1)
-        plt.xlim(0,1)
-        plt.xlabel('Coral')
-        plt.ylabel('Algae')
+                ax.plot(sol[:, 0], sol[:, 1], "k", alpha=0.4, lw=0.6)
+                # Directional arrow at the start
+                dx, dy = sol[5, 0] - sol[0, 0], sol[5, 1] - sol[0, 1]
+                ax.arrow(sol[0, 0], sol[0, 1], dx, dy, shape='full', lw=0, 
+                         length_includes_head=True, head_width=.015, color='k', alpha=0.4)
+
+        # 4. Use your new find_eq_points()
+        roots, stability_types = self.find_eq_points()
+
+        # Map the new string labels to colors
+        color_map = {
+            "Stable Node": "green",
+            "Stable Focus": "darkgreen",
+            "Unstable Source": "red",
+            "Unstable Focus": "darkred",
+            "Neutral/Center": "gray"
+        }
+
+        for root, label in zip(roots, stability_types):
+            # Determine color: blue for any kind of saddle, otherwise use map
+            color = "blue" if "Saddle" in label else color_map.get(label, "black")
+            
+            if is_3d:
+                ax.scatter(root[0], root[1], root[2], color=color, s=80, edgecolors='w', zorder=5)
+            else:
+                ax.plot(root[0], root[1], 'o', color=color, markersize=8, markeredgecolor='w', zorder=5)
+
+        # 5. Final Formatting
+        if is_3d:
+            # Draw the C + T + M = 1 plane boundary
+            ax.plot([1, 0, 0, 1], [0, 1, 0, 0], [0, 0, 1, 0], 'r--', alpha=0.2)
+        ax.set_xlabel('Coral (C)')
+        ax.set_ylabel('Turf (T)' if not is_3d else 'Turf (T)')
+        if is_3d: ax.set_zlabel('Macroalgae (M)')
+        
+        plt.title(f"Phase Space Analysis ({self.num_eq}D)")
+        plt.tight_layout()
         plt.show()
 
     def plot_roots_3d(self, unique_roots, stability_types):
@@ -393,7 +419,87 @@ class CoralODELab: # pylint: disable=invalid-name
 
         plt.show()
 
-    def calculate_basins(self, grid_density=10, t_end=500):
+    def plot_cross_section(self, fixed_var='T', fixed_val=0.2, grid_density=10, t_end=100):
+        """
+        Plots a 2D slice of the 3D phase space and overlays projected equilibrium points.
+        """
+        import matplotlib.pyplot as plt
+        from scipy.integrate import odeint
+
+        # 1. Coordinate Mapping
+        mapping = {'C': 0, 'T': 1, 'M': 2}
+        fixed_idx = mapping[fixed_var]
+        other_indices = [i for i in range(3) if i != fixed_idx]
+        labels = list(mapping.keys())
+        
+        fig, ax = plt.subplots(figsize=(9, 7))
+
+        # 2. Plot Trajectories on the Slice
+        axis = np.linspace(0.02, 1.0 - fixed_val - 0.02, grid_density)
+        t_span = np.linspace(0, t_end, 400)
+
+        for val1 in axis:
+            for val2 in axis:
+                if val1 + val2 + fixed_val <= 1.0:
+                    init = [0, 0, 0]
+                    init[fixed_idx] = fixed_val
+                    init[other_indices[0]] = val1
+                    init[other_indices[1]] = val2
+                    
+                    sol = odeint(self.ode, init, t_span)
+                    ax.plot(sol[:, other_indices[0]], sol[:, other_indices[1]], 
+                            "k", alpha=0.2, lw=0.5)
+
+        # 3. Get and Project Equilibrium Points
+        roots, stability_types = self.find_eq_points()
+        
+        for root, label in zip(roots, stability_types):
+            # Determine color based on stability string
+            if "Stable" in label:
+                color = "#2ecc71" # Green
+                marker = '*'
+            elif "Unstable" in label:
+                color = "#e74c3c" # Red
+                marker = 'o'
+            else: # Saddles
+                color = "#3498db" # Blue
+                marker = 'D'
+                
+            # Calculate distance from the slice to set transparency
+            dist_from_slice = abs(root[fixed_idx] - fixed_val)
+            # Only show roots within a reasonable 'viewing distance'
+            if dist_from_slice < 0.2:
+                alpha = max(0.2, 1.0 - (dist_from_slice * 4)) # Closer = more solid
+                
+                ax.scatter(root[other_indices[0]], root[other_indices[1]], 
+                           color=color, s=150, edgecolors='black', 
+                           marker=marker, alpha=alpha, zorder=5, label=label)
+                
+                # Label the root if it's very close to the slice
+                if dist_from_slice < 0.05:
+                    ax.text(root[other_indices[0]]+0.02, root[other_indices[1]]+0.02, 
+                            label, fontsize=8, fontweight='bold', alpha=alpha)
+
+        # 4. Simplex Constraint Line (The 'Wall' where C + T + M = 1)
+        # On our slice, the limit is: Var1 + Var2 = 1 - fixed_val
+        limit = 1.0 - fixed_val
+        ax.plot([0, limit], [limit, 0], 'r--', lw=1.5, label="Physical Limit")
+
+        # Formatting
+        ax.set_xlabel(f"Projected {labels[other_indices[0]]}")
+        ax.set_ylabel(f"Projected {labels[other_indices[1]]}")
+        ax.set_title(f"2D Phase Slice (Fixed {fixed_var} = {fixed_val})")
+        ax.set_xlim(0, 1); ax.set_ylim(0, 1)
+        
+        # Clean up legend (remove duplicates)
+        handles, plot_labels = ax.get_legend_handles_labels()
+        by_label = dict(zip(plot_labels, handles))
+        ax.legend(by_label.values(), by_label.keys(), loc='upper right', fontsize='small')
+
+        plt.tight_layout()
+        plt.show()        
+
+    def calculate_basins(self, grid_density=20, t_end=500):
         """
         Determines which stable equilibrium each point in the simplex evolves toward.
         """
@@ -429,42 +535,75 @@ class CoralODELab: # pylint: disable=invalid-name
 
         return np.array(points), np.array(labels), stable_roots
 
-    def calculate_basins(self, grid_density=10, t_end=500):
+    def calculate_basin_volumes(self, points, labels, stable_roots):
         """
-        Determines which stable equilibrium each point in the simplex evolves toward.
+        Calculates the percentage of the 3D simplex volume occupied by each attractor.
         """
-        # 1. Get only the stable roots (the 'attractors')
-        roots, stability = self.find_eq_points()
-        stable_roots = roots[np.array([s == "Stable Node" or s == "Stable Focus" for s in stability])]
+        total_points = len(labels)
+        volumes = {}
         
-        if len(stable_roots) == 0:
-            return "No stable attractors found."
+        # Identify which stable root is the 'Coral' one
+        # (Assuming the root with the highest Coral value is index 0 or similar)
+        for i, root in enumerate(stable_roots):
+            count = np.sum(labels == i)
+            percentage = (count / total_points) * 100
+            
+            # Create a descriptive key based on the root coordinates
+            # e.g., "Attractor at C=0.8, T=0.1, M=0.1"
+            key = f"Root {i} (C:{root[0]:.2f}, T:{root[1]:.2f}, M:{root[2]:.2f})"
+            volumes[key] = percentage
 
-        # 2. Create the grid
-        axis = np.linspace(0.02, 0.98, grid_density)
-        points = []
-        labels = []
+        return volumes
+    
+    def plot_basins_3d(self):
+        points, labels, stable_roots = self.calculate_basins()
+        volumes = self.calculate_basin_volumes(points, labels, stable_roots)
+
+        fig = plt.figure(figsize=(12, 10))
+        ax = fig.add_subplot(111, projection='3d')
         
-        t_span = np.linspace(0, t_end, 2) # We only care about the final state
+        # 1. Colors and labels
+        basin_colors = ['#2ecc71', '#e74c3c', '#3498db', '#f1c40f'] # Green, Red, Blue, Yellow
+        
+        # 2. Plot the Simplex Boundary
+        boundary = np.array([[1,0,0], [0,1,0], [0,0,1], [1,0,0]])
+        ax.plot(boundary[:,0], boundary[:,1], boundary[:,2], 'k-', alpha=0.4, lw=1.5)
 
-        for combination in product(axis, repeat=self.num_eq):
-            if sum(combination) <= 1.0:
-                # 3. Integrate from this point
-                # We use a long t_end to ensure it reaches equilibrium
-                sol = odeint(self.ode, combination, t_span)
-                final_state = sol[-1]
-                
-                # 4. Find the closest stable root (Euclidean distance)
-                distances = [np.linalg.norm(final_state - root) for root in stable_roots]
-                closest_root_index = np.argmin(distances)
-                
-                # Only count it if it actually reached the root (within tolerance)
-                if distances[closest_root_index] < 1e-2:
-                    points.append(combination)
-                    labels.append(closest_root_index)
+        # 3. Plot Basin Clouds (The territories)
+        for i, root in enumerate(stable_roots):
+            mask = (labels == i)
+            if np.any(mask):
+                ax.scatter(points[mask, 0], points[mask, 1], points[mask, 2], 
+                           color=basin_colors[i % len(basin_colors)], 
+                           alpha=0.2, s=5)
+            
+            # 4. Plot Stable Attractors (The Stars)
+            ax.scatter(root[0], root[1], root[2], 
+                       color=basin_colors[i % len(basin_colors)], 
+                       s=400, edgecolors='black', marker='*', label=f"Stable Root {i+1}")
 
-        return np.array(points), np.array(labels), stable_roots
+        # 5. Get and Plot Saddle Points (The Tipping Points)
+        all_roots, types = self.find_eq_points()
+        saddles = all_roots[["Saddle" in t for t in types]]
+        
+        if len(saddles) > 0:
+            ax.scatter(saddles[:,0], saddles[:,1], saddles[:,2], 
+                       color='blue', s=150, edgecolors='white', 
+                       marker='D', label="Saddle Point (Tipping Point)")
 
+        # Formatting
+        ax.set_xlabel('Coral (C)')
+        ax.set_ylabel('Turf (T)')
+        ax.set_zlabel('Macroalgae (M)')
+        ax.set_title("Full Ecological Landscape: Basins & Tipping Points")
+        ax.view_init(elev=30, azim=45)
+        ax.legend(loc='upper left', bbox_to_anchor=(1.05, 1))
+        
+        plt.tight_layout()
+        plt.show()
+        print(volumes)
+
+        
     def set_parameters(self, new_params=None, **kwargs):
         """
         Update parameters via a dictionary or keyword arguments.
