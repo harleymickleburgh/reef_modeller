@@ -8,6 +8,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 from scipy.optimize import fsolve
+from itertools import product
+
 
 class CoralODELab: # pylint: disable=invalid-name
     """This is a top-level class to use as an inherit class for all other models. We use it
@@ -228,67 +230,85 @@ class CoralODELab: # pylint: disable=invalid-name
         plt.show()
 
 
-    def find_eq_points(self):
+    def classify_stability(self,eigenvalues):
         """
-        find the location of the equilibirum points in phase space.
-        These can be unstable or stable saddle points in the phase plot
+        Classifies the stability of a root based on its eigenvalues.
         """
-        coral_counter = 0
-        start_conditions = []
-        # create set of starting conditions
-        # bounds will always be [0, 1] and can only sum to 1
-        for coral in np.linspace(0.1,1,20):
-            for algae in np.linspace(0.1, 1-coral-1e-6, 20-coral_counter):
-                start_conditions.append([coral,algae/2,algae/2])
-            coral_counter += 1
+        real_parts = np.real(eigenvalues)
+        imag_parts = np.imag(eigenvalues)
+        
+        n = len(real_parts)
+        pos = np.sum(real_parts > 1e-6)
+        neg = np.sum(real_parts < -1e-6)
+        has_spirals = np.any(np.abs(imag_parts) > 1e-6)
 
+        # 1. Stable Sink
+        if neg == n:
+            return "Stable Focus" if has_spirals else "Stable Node"
+        
+        # 2. Unstable Source
+        if pos == n:
+            return "Unstable Focus" if has_spirals else "Unstable Source"
+        
+        # 3. Saddle Points
+        if pos > 0 and neg > 0:
+            return f"Saddle ({pos} out, {neg} in)"
+        
+        # 4. Neutral / Center
+        return "Neutral/Center"
+
+
+    def find_eq_points(self, grid_density=10):
+        """
+        Finds equilibrium points for N-dimensions and determines stability.
+        """
         all_roots = []
         stability = []
-        for init in start_conditions:
-            # workout the stability points
-            roots, infodict, ier, mesg = fsolve(self.ode, init, args=(0), full_output = True)
-            if ier not in [1, 2, 3, 4]:
-                raise RuntimeError(f"Solver failed with message: {mesg}")
-            matrixr=np.zeros((self.num_eq, self.num_eq))  # dim= number of linear equations
-            matrixr[np.triu_indices(self.num_eq)]=infodict["r"]  # to unpack "r" into matrix
-            Jacobian=(infodict["fjac"].T).dot(matrixr) # needs .T to get Q
-            if np.isnan(Jacobian).any():
-                stability.append(-1)
-                continue
-            eigenvalues=np.array(np.linalg.eigvals(Jacobian))
-            all_roots.append(roots)
-            # work out stability of that root
-            if isinstance(eigenvalues[0], complex):
-                if np.any(eigenvalues.real >= 0):
-                    stability.append(-1)
-                else:
-                    stability.append(1)
-            else:
-                if np.all(eigenvalues > 0):
-                    stability.append(-1)
-                elif np.all(eigenvalues < 0):
-                    stability.append(1)
-                else:
-                    stability.append(0)
+        
+        # 1. Generate starting conditions for N variables
+        # We create a linear space for each variable [0, 1]
+        axis = np.linspace(0.01, 0.99, grid_density)
+        
+        # product(*[axis]*N) creates an N-dimensional grid
+        for combination in product(axis, repeat=self.num_eq):
+            # Constraint: variables cannot sum to more than 1 (Space S must be >= 0)
+            if sum(combination) < 1.0:
+                start_init = list(combination)
+                
+                # 2. Solve for roots
+                # full_output=True gives us the infodict needed for the Jacobian
+                roots, infodict, ier, mesg = fsolve(
+                    self.ode, start_init, args=(0), full_output=True
+                )
+                
+                if ier in [1, 2, 3, 4]:
+                    # 3. Calculate Jacobian from fsolve output
+                    # fjac is the orthogonal matrix, r is the upper triangular
+                    matrix_r = np.zeros((self.num_eq, self.num_eq))
+                    matrix_r[np.triu_indices(self.num_eq)] = infodict["r"]
+                    Jacobian = (infodict["fjac"].T).dot(matrix_r)
+                    
+                    if not np.isnan(Jacobian).any():
+                        label = classify_stability(eigenvalues)
+                        all_roots.append(roots)
+                        stability.append(label)                        
+        
+        if not all_roots:
+            return np.array([]), []
 
-        all_roots = np.array(all_roots)
-        # make small numbers zero in the roots
-        tol = 1e-10
-        all_roots[abs(all_roots) < tol] = 0.0
-        all_roots = all_roots.round(decimals=8)
-        stability = np.array(stability)
+        # 5. Clean and find unique roots
+        all_roots = np.array(all_roots).round(decimals=6)
+        # Filter: must be positive and sum <= 1
+        mask = np.all(all_roots >= 0, axis=1) & (np.sum(all_roots, axis=1) <= 1.001)
+        all_roots = all_roots[mask]
+        stability = np.array(stability)[mask]
+        
+        unique_roots, indices = np.unique(all_roots, axis=0, return_index=True)
+        unique_stability = stability[indices]
 
-        unique_roots = np.unique(all_roots,axis=0)
-        #remove any where the root < 0
-        unique_roots = unique_roots[np.all(unique_roots >= 0, axis=1)]
-        root_stability_type = []
-        # the stability is the minimum for all stabilities for each unqie root
-        for root in unique_roots:
-            indicies = np.where(np.all(root == all_roots,axis=1))
-            stab_for_root = np.min(stability[np.array(indicies[0])])
-            root_stability_type.append(stab_for_root)
+        return unique_roots, unique_stability
 
-        return(unique_roots, root_stability_type)
+
 
     def plot_phase_space(self):
         """
@@ -329,6 +349,121 @@ class CoralODELab: # pylint: disable=invalid-name
         plt.xlabel('Coral')
         plt.ylabel('Algae')
         plt.show()
+
+    def plot_roots_3d(self, unique_roots, stability_types):
+        fig = plt.figure(figsize=(10, 8))
+        ax = fig.add_subplot(111, projection='3d')
+
+        # 1. Define Color Map for Stability
+        color_map = {
+            "Stable Node": "green",
+            "Stable Focus": "darkgreen",
+            "Unstable Source": "red",
+            "Unstable Focus": "darkred",
+            "Neutral/Center": "gray"
+        }
+        
+        # 2. Plot the Boundary Simplex (C + T + M = 1)
+        # This helps visualize the "ceiling" of the ecological space
+        verts = [
+            [1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 0, 0]
+        ]
+        x, y, z = zip(*verts)
+        ax.plot(x, y, z, color='black', alpha=0.3, linestyle='--', label="Simplex Boundary")
+
+        # 3. Plot each root
+        for root, stab in zip(unique_roots, stability_types):
+            # Determine color based on stability label
+            # (Handles "Saddle (x out, y in)" by checking if 'Saddle' is in the string)
+            color = "blue" if "Saddle" in stab else color_map.get(stab, "black")
+            
+            ax.scatter(root[0], root[1], root[2], 
+                       color=color, s=100, edgecolors='white', label=stab)
+
+        # 4. Formatting
+        ax.set_xlabel('Coral (C)')
+        ax.set_ylabel('Turf (T)')
+        ax.set_zlabel('Macroalgae (M)')
+        ax.set_title('Equilibrium Points in C-T-M Space')
+        
+        # Remove duplicate labels in legend
+        handles, labels = ax.get_legend_handles_labels()
+        unique_labels = dict(zip(labels, handles))
+        ax.legend(unique_labels.values(), unique_labels.keys(), loc='upper left')
+
+        plt.show()
+
+    def calculate_basins(self, grid_density=10, t_end=500):
+        """
+        Determines which stable equilibrium each point in the simplex evolves toward.
+        """
+        # 1. Get only the stable roots (the 'attractors')
+        roots, stability = self.find_eq_points()
+        stable_roots = roots[np.array([s == "Stable Node" or s == "Stable Focus" for s in stability])]
+        
+        if len(stable_roots) == 0:
+            return "No stable attractors found."
+
+        # 2. Create the grid
+        axis = np.linspace(0.02, 0.98, grid_density)
+        points = []
+        labels = []
+        
+        t_span = np.linspace(0, t_end, 2) # We only care about the final state
+
+        for combination in product(axis, repeat=self.num_eq):
+            if sum(combination) <= 1.0:
+                # 3. Integrate from this point
+                # We use a long t_end to ensure it reaches equilibrium
+                sol = odeint(self.ode, combination, t_span)
+                final_state = sol[-1]
+                
+                # 4. Find the closest stable root (Euclidean distance)
+                distances = [np.linalg.norm(final_state - root) for root in stable_roots]
+                closest_root_index = np.argmin(distances)
+                
+                # Only count it if it actually reached the root (within tolerance)
+                if distances[closest_root_index] < 1e-2:
+                    points.append(combination)
+                    labels.append(closest_root_index)
+
+        return np.array(points), np.array(labels), stable_roots
+
+    def calculate_basins(self, grid_density=10, t_end=500):
+        """
+        Determines which stable equilibrium each point in the simplex evolves toward.
+        """
+        # 1. Get only the stable roots (the 'attractors')
+        roots, stability = self.find_eq_points()
+        stable_roots = roots[np.array([s == "Stable Node" or s == "Stable Focus" for s in stability])]
+        
+        if len(stable_roots) == 0:
+            return "No stable attractors found."
+
+        # 2. Create the grid
+        axis = np.linspace(0.02, 0.98, grid_density)
+        points = []
+        labels = []
+        
+        t_span = np.linspace(0, t_end, 2) # We only care about the final state
+
+        for combination in product(axis, repeat=self.num_eq):
+            if sum(combination) <= 1.0:
+                # 3. Integrate from this point
+                # We use a long t_end to ensure it reaches equilibrium
+                sol = odeint(self.ode, combination, t_span)
+                final_state = sol[-1]
+                
+                # 4. Find the closest stable root (Euclidean distance)
+                distances = [np.linalg.norm(final_state - root) for root in stable_roots]
+                closest_root_index = np.argmin(distances)
+                
+                # Only count it if it actually reached the root (within tolerance)
+                if distances[closest_root_index] < 1e-2:
+                    points.append(combination)
+                    labels.append(closest_root_index)
+
+        return np.array(points), np.array(labels), stable_roots
 
     def set_parameters(self, new_params=None, **kwargs):
         """
