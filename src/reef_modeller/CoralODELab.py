@@ -194,11 +194,18 @@ class CoralODELab: # pylint: disable=invalid-name
             #save figure
             pass
 
-    def plot_bifurcation(self, parameter):
+    def plot_bifurcation(self, parameter, ax=None, legend_loc='best'):
         """
-        Create a bifurcation plot, with coral on the y axis 
+        Create a bifurcation plot, with % cover of all species on the y axis 
         and the parameter on the x axis. 
         """
+        import matplotlib.pyplot as plt
+        import matplotlib.lines as mlines
+        import numpy as np
+
+        # If no axis is provided, create a new figure
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(8, 6))
 
         # get parameter range
         param_range = np.linspace(self.parameter_range[parameter][0],
@@ -209,26 +216,48 @@ class CoralODELab: # pylint: disable=invalid-name
         # loop through param range
         for p in param_range:
             self.set_parameters(**{parameter: p})
-            # find roots and remove unstable ones (saddles and stable)
             roots, type_root = self.find_eq_points()
             all_roots.append(roots)
             types.append(type_root)
 
-        # will have to plot as points
+        # Plot the roots
         for rr, tr, p in zip(all_roots, types, param_range):
             for r, t in zip(rr, tr):
-                if t == -1:
-                    plt.plot(p, r[0], 'sr', markersize=3)
-                elif t == 0:
-                    plt.plot(p, r[0], 'sb', markersize=3)
+                if "Stable" in t:
+                    m_style, alpha_val = 'o', 1.0
                 else:
-                    plt.plot(p, r[0], 'sm', markersize=3)
-        #plt.ylim(0,1)
-        plt.xlim(param_range[0], param_range[-1])
-        plt.xlabel(parameter)
-        plt.ylabel('% cover')
-        plt.show()
+                    m_style, alpha_val = 'x', 0.3
 
+                ax.plot(p, r[0], marker=m_style, color=self._coral_colour, 
+                        markersize=3, alpha=alpha_val, linestyle='None')
+                
+                if self.num_eq == 2:
+                    ax.plot(p, r[1], marker=m_style, color=self._malgae_colour, 
+                            markersize=3, alpha=alpha_val, linestyle='None')
+                elif self.num_eq == 3:
+                    ax.plot(p, r[1], marker=m_style, color=self._talgae_colour, 
+                            markersize=3, alpha=alpha_val, linestyle='None')
+                    ax.plot(p, r[2], marker=m_style, color=self._malgae_colour, 
+                            markersize=3, alpha=alpha_val, linestyle='None')
+
+        ax.set_xlim(param_range[0], param_range[-1])
+        ax.set_ylim(-0.05, 1.05)
+        ax.set_xlabel(self.parameter_names.get(parameter, parameter))
+        ax.set_ylabel('% cover')
+
+        # Custom Legend Handles
+        handles = [mlines.Line2D([], [], color=self._coral_colour, marker='o', linestyle='None', label='Coral')]
+        if self.num_eq == 2:
+            handles.append(mlines.Line2D([], [], color=self._malgae_colour, marker='o', linestyle='None', label='Algae'))
+        elif self.num_eq == 3:
+            handles.append(mlines.Line2D([], [], color=self._talgae_colour, marker='o', linestyle='None', label='Turf algae'))
+            handles.append(mlines.Line2D([], [], color=self._malgae_colour, marker='o', linestyle='None', label='Macroalgae'))
+        
+        handles.append(mlines.Line2D([], [], color='black', marker='o', linestyle='None', label='Stable (Node)'))
+        handles.append(mlines.Line2D([], [], color='black', marker='x', alpha=0.5, linestyle='None', label='Unstable'))
+
+        ax.legend(handles=handles, loc=legend_loc)
+        return ax
 
     def classify_stability(self,eigenvalues):
         """
@@ -373,6 +402,7 @@ class CoralODELab: # pylint: disable=invalid-name
         if is_3d: ax.set_zlabel('Macroalgae (M)')
         
         plt.title(f"Phase Space Analysis ({self.num_eq}D)")
+        ax.legend(loc="best")
         plt.tight_layout()
         plt.show()
 
@@ -419,7 +449,7 @@ class CoralODELab: # pylint: disable=invalid-name
 
         plt.show()
 
-    def plot_cross_section(self, fixed_var='T', fixed_val=0.2, grid_density=10, t_end=100):
+    def plot_cross_section(self, fixed_var='T', fixed_val=0.4, grid_density=10, t_end=100):
         """
         Plots a 2D slice of the 3D phase space and overlays projected equilibrium points.
         """
