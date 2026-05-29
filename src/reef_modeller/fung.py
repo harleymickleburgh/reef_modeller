@@ -13,16 +13,16 @@ class FungCTMm(CoralODELab):
             "dc" : 0.05, #coral mortality rate (yr^-1)
             "lbc" : 0.0009, #rate at which coral larvae, produced by local established brooding corals, recruit onto space (yr^-1)
             "lsc" : 0.00006, #rate at which exogenus spawning coral larvae recruit onto space (yr^-1)
-            "rc" : 0.2, # lateral growth rate of corals over space (yr^-1)
-            "gT" : 10, #maximum rate at which turf algae is grazed (yr^-1)
-            "ac" : 0.25, #growth rate of corals over turf, relative to the rate over space
+            "rc" : 0.3, # lateral growth rate of corals over space (yr^-1)
+            "gT" : 7, #maximum rate at which turf algae is grazed (yr^-1)
+            "ac" : 0.025, #growth rate of corals over turf, relative to the rate over space
             "ec" : 0.1, #recruitment rate of corals onto turf, relative to the rate onto space 
-            "sT" : 5, #growth rate of fine turf (occupying space) (yr^-1)
+            "sT" : 10, #growth rate of fine turf (occupying space) (yr^-1)
             "gm" : 0.5,
             "rm" : 0.35,
             "bm" : 0.9,
-            "ymc" : 0.1,
-            "ymt" : 0.9,    
+            "ymc" : 0.02,
+            "ymt" : 0.97,    
             }
         self.p = SimpleNamespace(**self.parameters)
     
@@ -80,8 +80,9 @@ class FungCTMm(CoralODELab):
         """
         S = 1.0 - sum(z)
         C = z[0]
-        M = z[2]
         T = z[1]
+        M = z[2]
+
 
         #coral dC
         recruitmentC = (self.p.lsc + self.p.lbc * C) * (S + self.p.ec * T)
@@ -107,6 +108,69 @@ class FungCTMm(CoralODELab):
         dMdt = growthM - grazingM
         
         return [dCdt, dTdt, dMdt]
+
+    def analytical_jacobian(self, state):
+        """
+        Calculates the exact analytical Jacobian matrix for the Fung et al. model.
+        Assumes state vector is ordered as [Coral, Turf, Macroalgae].
+        """
+        import numpy as np
+        
+        C, T, M = state
+        S = 1.0 - C - T - M
+        
+        # Unpack parameters (adjust these string keys to match your self.p dictionary)
+        l_s_c = self.p.lsc
+        l_b_c = self.p.lbc
+        eps_c = self.p.ec
+        r_c = self.p.rc
+        beta_M = self.p.bm
+        alpha_c = self.p.ac
+        d_c = self.p.dc
+        gamma_MC = self.p.ymc
+        r_m = self.p.rm
+        g_M = self.p.gm
+        gamma_MT = self.p.ymt
+        zeta_T = self.p.sT
+        theta = self.p.theta
+        g_T = self.p.gT
+        
+        # 1. dC/dt derivatives
+        dC_dC = l_b_c * (S + eps_c * T) - (l_s_c + l_b_c * C) + \
+                r_c * (1 - beta_M * M) * (S + alpha_c * T - C) - \
+                d_c - gamma_MC * r_m * M
+                
+        dC_dT = (l_s_c + l_b_c * C) * (eps_c - 1) + \
+                r_c * (1 - beta_M * M) * C * (alpha_c - 1)
+                
+        dC_dM = -(l_s_c + l_b_c * C) - \
+                r_c * C * (beta_M * (S + alpha_c * T) + (1 - beta_M * M)) - \
+                gamma_MC * r_m * C
+        
+        # 2. dT/dt derivatives
+        dT_dC = -zeta_T * (1 - theta) - eps_c * l_b_c * T - \
+                alpha_c * r_c * (1 - beta_M * M) * T
+                
+        dT_dT = -zeta_T * (1 - theta) - g_T * theta - \
+                eps_c * (l_s_c + l_b_c * C) - \
+                alpha_c * r_c * (1 - beta_M * M) * C - \
+                gamma_MT * r_m * M
+                
+        dT_dM = -zeta_T * (1 - theta) + \
+                alpha_c * r_c * beta_M * T * C - \
+                gamma_MT * r_m * T
+        
+        # 3. dM/dt derivatives
+        dM_dC = r_m * M * (gamma_MC - 1)
+        dM_dT = r_m * M * (gamma_MT - 1)
+        dM_dM = r_m * (S + gamma_MC * C + gamma_MT * T - M) - g_M * theta
+        
+        # Return as 3x3 array ordered [C, T, M]
+        return np.array([
+            [dC_dC, dC_dT, dC_dM],
+            [dT_dC, dT_dT, dT_dM],
+            [dM_dC, dM_dT, dM_dM]
+        ])
 
 
 class FungCAm(CoralODELab):
