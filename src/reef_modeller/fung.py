@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from types import SimpleNamespace
 from .CoralODELab import CoralODELab
+import numpy as np
 
 class FungCTMm(CoralODELab):
     def __init__(self):
@@ -109,17 +110,15 @@ class FungCTMm(CoralODELab):
         
         return [dCdt, dTdt, dMdt]
 
-    def analytical_jacobian(self, state):
+    def analytical_jacobian(self, state, time=0):
         """
         Calculates the exact analytical Jacobian matrix for the Fung et al. model.
         Assumes state vector is ordered as [Coral, Turf, Macroalgae].
         """
-        import numpy as np
         
         C, T, M = state
         S = 1.0 - C - T - M
         
-        # Unpack parameters (adjust these string keys to match your self.p dictionary)
         l_s_c = self.p.lsc
         l_b_c = self.p.lbc
         eps_c = self.p.ec
@@ -134,6 +133,7 @@ class FungCTMm(CoralODELab):
         zeta_T = self.p.sT
         theta = self.p.theta
         g_T = self.p.gT
+
         
         # 1. dC/dt derivatives
         dC_dC = l_b_c * (S + eps_c * T) - (l_s_c + l_b_c * C) + \
