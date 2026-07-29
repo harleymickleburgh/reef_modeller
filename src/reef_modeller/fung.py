@@ -57,8 +57,8 @@ class FungCTMm(CoralODELab):
             "gm" : [0, 1],
             "rm" : [0.05, 0.4],
             "bm" : [0.2, 0.9],
-            "ymc" : [0, 0.9],
-            "ymt" : [0, 0.9]
+            "ymc" : [0, 2.0],
+            "ymt" : [0, 2.0]
             }
         self.citation = "Fung, T., Seymour, R. M., & Johnson, C. R. (2011). Alternative stable states and phase shifts in coral reefs under anthropogenic stress. Ecology, 92(4), 967–982."
         

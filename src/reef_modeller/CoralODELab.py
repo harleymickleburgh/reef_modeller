@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 from scipy.optimize import fsolve
 from itertools import product
-
+from scipy.stats import qmc
 
 class CoralODELab: # pylint: disable=invalid-name
     """This is a top-level class to use as an inherit class for all other models. We use it
@@ -242,7 +242,7 @@ class CoralODELab: # pylint: disable=invalid-name
 
         ax.set_xlim(param_range[0], param_range[-1])
         ax.set_ylim(-0.05, 1.05)
-        ax.set_xlabel(self.parameter_names.get(parameter, parameter))
+        ax.set_xlabel(self.parameter_names.get(parameter, parameter).capitalize())
         ax.set_ylabel('% cover')
 
         # Custom Legend Handles
@@ -286,43 +286,54 @@ class CoralODELab: # pylint: disable=invalid-name
         # 4. Neutral / Center
         return "Neutral/Center"
 
+    def generate_simplex_lhs(self, dim, n_samples):
+        """
+        Generates n_samples in `dim` dimensions such that:
+        x_i >= 0  AND  sum(x_i) <= 1
+        without discarding any invalid samples.
+        """
+        # 1. Sample in (dim + 1) dimensions to account for the slack variable
+        sampler = qmc.LatinHypercube(d=dim + 1)
+        u = sampler.random(n=n_samples)
+        
+        # 2. Avoid numerical issues with log(0)
+        u = np.clip(u, 1e-12, 1.0 - 1e-12)
+        
+        # 3. Transform uniform samples into exponential variables
+        e = -np.log(u)
+        
+        # 4. Normalize across the rows so each row sums to 1.0
+        y = e / np.sum(e, axis=1, keepdims=True)
+        
+        # 5. Drop the last (slack) column. 
+        # The remaining `dim` columns naturally sum to <= 1.0.
+        return y[:, :dim]
 
-    def find_eq_points(self, grid_density=10):
-        """
-        Finds equilibrium points for N-dimensions and determines stability.
-        """
+    def find_eq_points(self, num_samples=1000):
         all_roots = []
         stability = []
         
-        # 1. Generate starting conditions for N variables
-        # We create a linear space for each variable [0, 1]
-        axis = np.linspace(0.01, 0.99, grid_density)
+        # 1. Generate guaranteed valid guesses inside the simplex
+        initial_guesses = self.generate_simplex_lhs(self.num_eq, num_samples)
         
-        # product(*[axis]*N) creates an N-dimensional grid
-        for combination in product(axis, repeat=self.num_eq):
-            # Constraint: variables cannot sum to more than 1 (Space S must be >= 0)
-            if sum(combination) < 1.0:
-                start_init = list(combination)
-                
-                # 2. Solve for roots
-                # full_output=True gives us the infodict needed for the Jacobian
-                roots, infodict, ier, mesg = fsolve(
-                    self.ode, start_init, args=(0), full_output=True
-                )
-                
-                if ier in [1, 2, 3, 4]:
-                    # 3. Calculate Jacobian from fsolve output
-                    # fjac is the orthogonal matrix, r is the upper triangular
-                    matrix_r = np.zeros((self.num_eq, self.num_eq))
-                    matrix_r[np.triu_indices(self.num_eq)] = infodict["r"]
-                    Jacobian = (infodict["fjac"].T).dot(matrix_r)
-                    
-                    if not np.isnan(Jacobian).any():
-                        eigenvalues = np.linalg.eigvals(Jacobian)
-                        label = self.classify_stability(eigenvalues)
-                        all_roots.append(roots)
-                        stability.append(label)                        
-        
+        # 2. Loop directly over valid guesses (100% acceptance rate)
+        for start_init in initial_guesses:
+            roots, infodict, ier, mesg = fsolve(
+                self.ode, 
+                start_init, 
+                args=(0),
+                fprime=self.analytical_jacobian,
+                full_output=True
+            )
+            
+            if ier in [1, 2, 3, 4]:
+                Jacobian = self.analytical_jacobian(roots)
+                if not np.isnan(Jacobian).any():
+                    eigenvalues = np.linalg.eigvals(Jacobian)
+                    label = self.classify_stability(eigenvalues)
+                    all_roots.append(roots)
+                    stability.append(label)   
+            
         if not all_roots:
             return np.array([]), []
 
