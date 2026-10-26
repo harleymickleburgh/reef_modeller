@@ -755,9 +755,11 @@ class Mumby(CoralODELab):
         MovergrowthdC = self.p.a * M
         dCdC = recruitmentdC - mortalitydC - MovergrowthdC
         
-        
-        
-        return[dCdC]
+       
         #second derivatives of dM/dt
-        
+        MMovergrowthdM = self.p.a * C
+        grazingdM =self.p.g()
+        growthdM = self.p.y(1 - C - (2 * M))
+
+        return[dCdC, dMdM]
 
