@@ -735,4 +735,21 @@ class Mumby(CoralODELab):
         
     
         return[dCdt, dMdt]
+    
+    def analytical_jacobian(self, z, t=0):
+        """
+        Analytical Jacobian matrix [ [d(dCdt)/dC, d(dCdt)/dM],
+                                     [d(dMdt)/dC, d(dMdt)/dM] ]
+        allows for calculating of equilbrium and makes the plots
+        easier
+        
+        """
+        C = z[0]
+        M = z[1]
+        T = 1 - C - M
+        
+        #partial derivatives for dC/dt
+        
+        #partial derivatives for dM/dt
+        
 
