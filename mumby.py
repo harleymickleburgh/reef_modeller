@@ -679,7 +679,7 @@ from types import SimpleNamespace
 class Mumby(CoralODELab):
 
     def __init__(self):
-        CoralODELab.__init__(self,"Mumby")
+        super().__init__("Mumby")
         self.num_parameters = 5
         self.num_eq = 2
         self.parameters = {
