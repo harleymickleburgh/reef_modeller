@@ -748,8 +748,16 @@ class Mumby(CoralODELab):
         M = z[1]
         T = 1 - C - M
         
-        #partial derivatives for dC/dt
+        #second derivative of dC/dt
+        #split terms derive them all, put it back together
+        recruitmentdC = self.p.r *(1 - 2 * C - M)
+        mortalitydC = self.p.d
+        MovergrowthdC = self.p.a * M
+        dCdC = recruitmentdC - mortalitydC - MovergrowthdC
         
-        #partial derivatives for dM/dt
+        
+        
+        return[dCdC]
+        #second derivatives of dM/dt
         
 
