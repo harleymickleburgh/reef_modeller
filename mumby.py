@@ -746,45 +746,26 @@ class Mumby(CoralODELab):
         """
         C = z[0]
         M = z[1]
-        T = 1 - C - M
+        T = max(1 - C, 1e-9)
         
-        #partial derivative of dC/dt
-        
-        #change of dC/dt as coral chsnges
-        recruitmentdC = self.p.r *(1 - 2 * C - M)
-        mortalitydC = self.p.d
-        overgrowthdC = self.p.a * M
-        dCdC = recruitmentdC - mortalitydC - overgrowthdC
-        
-        #change of dC/dt as macroalagae changes
-        recruitmentdCM = -self.p.r * C
-        overgrowthdCM = self.p.a * C
-        dCdM = recruitmentdCM - overgrowthdCM
-       
-        #partial derovative of dM/dt
-        
-        #change of dM/dt as coral changes
-        MovergrowthdM = self.p.a * C
-        grazingdM =self.p.g / (1 - C)
-        growthdM = self.p.y * (1 - C - (2 * M))
-        dMdC = MovergrowthdM + growthdM - grazingdM
-        
-        #change of dM/dt as macroalgae changes
-        MovergrowthdMM = self.p.a * C
-        GrowthdMM = self.p.y * (1 - C - 2 * M)
-        grazingdMM = self.p.g / T
-        dMdM = MovergrowthdMM + GrowthdMM - grazingdMM
+        #partial derivative of Coral Growthrate, dC/dt
+        dCdC = self.p.r *(1- 2 * C - M) - self.p.d - self.p.a * M
+        dCdM = -(self.p.r + self.p.a) * C
+  
+        #partial derivative of Macroalgae Growthrate, dM/dt
+        dMdC = (self.p.a - self.p.y) * M - (self.p.g * M) / (T**2)
+        dMdM = self.p.a * C + self.p.y * (1 - C - 2 * M) - (self.p.g /T)
 
         return np.aray([[dCdC, dCdM],
                         [dMdC, dMdM]])
-    
+ 
 if __name__ == "__main__":
     #set up inital conditions for the bifurcation plot
     model = Mumby()
+    model.set_times([0, 100])
     model.set_start_conditions([0.5,0.1])
     model.solve_time()
     model.plot_through_time()
     model.plot_bifurcation(parameter= "g")
     model.plot_phase_space(grid_density=8, t_end=100)
-        
 
