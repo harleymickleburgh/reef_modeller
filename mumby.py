@@ -724,14 +724,14 @@ class Mumby(CoralODELab):
         #coral
         recruitmentC = self.p.r * T * C
         mortalityC = self.p.d * C
-        Movergrowth = self.p.a * M * C
-        dCdt = recruitmentC - mortalityC - Movergrowth
+        overgrowth = self.p.a * M * C
+        dCdt = recruitmentC - mortalityC - overgrowth
         
         # macroalgae
-        MMovergrowth = self.p.a * M * C
+        Movergrowth = self.p.a * M * C
         grazing = (self.p.g * M) / (M + T)
-        growthM = self.p.y * M * T
-        dMdt = MMovergrowth - grazing + growthM
+        growth = self.p.y * M * T
+        dMdt = Movergrowth - grazing + growth
         
     
         return[dCdt, dMdt]
@@ -753,25 +753,29 @@ class Mumby(CoralODELab):
         #change of dC/dt as coral chsnges
         recruitmentdC = self.p.r *(1 - 2 * C - M)
         mortalitydC = self.p.d
-        MovergrowthdC = self.p.a * M
-        dCdC = recruitmentdC - mortalitydC - MovergrowthdC
+        overgrowthdC = self.p.a * M
+        dCdC = recruitmentdC - mortalitydC - overgrowthdC
         
         #change of dC/dt as macroalagae changes
-        recruitmentdM = -self.p.r * C
-        overgrowthdM = self.p.a * C
-        dCdM = recruitmentdM - overgrowthdM
+        recruitmentdCM = -self.p.r * C
+        overgrowthdCM = self.p.a * C
+        dCdM = recruitmentdCM - overgrowthdCM
        
         #partial derovative of dM/dt
         
         #change of dM/dt as coral changes
-        MMovergrowthdM = self.p.a * C
+        MovergrowthdM = self.p.a * C
         grazingdM =self.p.g / (1 - C)
-        growthdM = self.p.y(1 - C - (2 * M))
-        dMdM = MMovergrowthdM + growthdM - grazingdM
+        growthdM = self.p.y * (1 - C - (2 * M))
+        dMdC = MovergrowthdM + growthdM - grazingdM
         
         #change of dM/dt as macroalgae changes
+        MovergrowthdMM = self.p.a * C
+        GrowthdMM = self.p.y * (1 - C - 2 * M)
+        grazingdMM = self.p.g / T
+        dMdM = MovergrowthdMM + GrowthdMM - grazingdMM
 
-        return np.aaray([[dCdC, dCdM],
+        return np.aray([[dCdC, dCdM],
                         [dMdC, dMdM]])
     
 if __name__ == "__main__":
