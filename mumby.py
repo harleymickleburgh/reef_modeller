@@ -748,21 +748,31 @@ class Mumby(CoralODELab):
         M = z[1]
         T = 1 - C - M
         
-        #second derivative of dC/dt
-        #split terms derive them all, put it back together
+        #partial derivative of dC/dt
+        
+        #change of dC/dt as coral chsnges
         recruitmentdC = self.p.r *(1 - 2 * C - M)
         mortalitydC = self.p.d
         MovergrowthdC = self.p.a * M
         dCdC = recruitmentdC - mortalitydC - MovergrowthdC
         
+        #change of dC/dt as macroalagae changes
+        recruitmentdM = -self.p.r * C
+        overgrowthdM = self.p.a * C
+        dCdM = recruitmentdM - overgrowthdM
        
-        #second derivatives of dM/dt
+        #partial derovative of dM/dt
+        
+        #change of dM/dt as coral changes
         MMovergrowthdM = self.p.a * C
         grazingdM =self.p.g / (1 - C)
         growthdM = self.p.y(1 - C - (2 * M))
         dMdM = MMovergrowthdM + growthdM - grazingdM
+        
+        #change of dM/dt as macroalgae changes
 
-        return[dCdC, dMdM]
+        return np.aaray([[dCdC, dCdM],
+                        [dMdC, dMdM]])
     
 if __name__ == "__main__":
     #set up inital conditions for the bifurcation plot
