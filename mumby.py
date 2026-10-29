@@ -756,7 +756,7 @@ class Mumby(CoralODELab):
         dMdC = (self.p.a - self.p.y) * M - (self.p.g * M) / (T**2)
         dMdM = self.p.a * C + self.p.y * (1 - C - 2 * M) - (self.p.g /T)
 
-        return np.aray([[dCdC, dCdM],
+        return np.array([[dCdC, dCdM],
                         [dMdC, dMdM]])
  
 if __name__ == "__main__":
@@ -768,4 +768,82 @@ if __name__ == "__main__":
     model.plot_through_time()
     model.plot_bifurcation(parameter= "g")
     model.plot_phase_space(grid_density=8, t_end=100)
+    
+def plot_mumby_fig3_exact(model, g_val=0.3):
+    """
+    Replicates Figure 3 from Mumby et al. (2007) exactly.
+    """
+    model.set_parameters(g=g_val)
+    fig, ax = plt.subplots(figsize=(7, 6))
 
+    # 1. Sample initial conditions strictly within the valid simplex (C + M <= 1)
+    grid = np.linspace(0.05, 0.90, 8)
+    t_span = np.linspace(0, 100, 500)
+
+    for m0 in grid:
+        for c0 in grid:
+            if m0 + c0 <= 0.95:
+                # Solve ODE: z = [C, M]
+                sol = odeint(model.ode, [c0, m0], t_span)
+                sol = np.clip(sol, 0, 1.0)  # Keep within physical bounds
+                
+                c_traj = sol[:, 0]
+                m_traj = sol[:, 1]
+
+                # Plot red trajectory line
+                ax.plot(m_traj, c_traj, color='#d9534f', alpha=0.6, lw=1.0)
+                ax.plot(m0, c0, 'o', color='#d9534f', markersize=3, alpha=0.5)
+
+                # Add directional arrow along the curve
+                step = 25
+                dm = m_traj[step+5] - m_traj[step]
+                dc = c_traj[step+5] - c_traj[step]
+                if np.hypot(dm, dc) > 1e-4:
+                    ax.annotate('', xy=(m_traj[step] + dm, c_traj[step] + dc), 
+                                xytext=(m_traj[step], c_traj[step]),
+                                arrowprops=dict(arrowstyle="-|>", color='#d9534f', lw=1.2, mutation_scale=10))
+
+    # 2. Draw physical simplex boundary (C + M = 1)
+    ax.plot([0, 1], [1, 0], 'k--', alpha=0.3, label='Physical Constraint (C+M=1)')
+
+    # 3. Find and plot equilibrium points with paper notation
+    roots, stability = model.find_eq_points()
+    for root, stab in zip(roots, stability):
+        c_eq, m_eq = root[0], root[1]
+
+        # Determine paper label (Cs, Ms, CMTu, Tu)
+        if c_eq > 0.3 and m_eq < 0.1:
+            label = "$C_s$" if "Stable" in stab else "$C_u$"
+        elif m_eq > 0.3 and c_eq < 0.1:
+            label = "$M_s$"
+        elif c_eq < 0.05 and m_eq < 0.05:
+            label = "$T_u$"
+        else:
+            label = "$CMT_u$"
+
+        is_stable = "Stable" in stab
+        marker_face = 'black' if is_stable else 'white'
+        
+        ax.plot(m_eq, c_eq, marker='o', color='black', 
+                markerfacecolor=marker_face, markersize=8, zorder=5)
+        ax.text(m_eq + 0.025, c_eq + 0.01, label, fontsize=11, fontweight='bold')
+
+    # Formatting matching Mumby et al. (2007)
+    ax.set_xlim(-0.02, 1.0)
+    ax.set_ylim(-0.02, 1.0)
+    ax.set_xlabel('Macroalgae')
+    ax.set_ylabel('Coral cover')
+    ax.set_title(f'Figure 3: Phase Plane (g = {g_val})')
+    plt.tight_layout()
+    plt.show()
+
+
+if __name__ == "__main__":
+    model = Mumby()
+    model.set_times([0, 100])
+    
+    # Figure 3a: High Grazing (Bistable)
+    plot_mumby_fig3_exact(model, g_val=0.3)
+    
+    # Figure 3b: Low Grazing (Single Stable State)
+    plot_mumby_fig3_exact(model, g_val=0.1)
