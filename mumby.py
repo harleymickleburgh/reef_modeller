@@ -763,4 +763,14 @@ class Mumby(CoralODELab):
         dMdM = MMovergrowthdM + growthdM - grazingdM
 
         return[dCdC, dMdM]
+    
+if __name__ == "__main__":
+    #set up inital conditions for the bifurcation plot
+    model = Mumby()
+    model.set_start_conditions([0.5,0.1])
+    model.solve_time()
+    model.plot_through_time()
+    model.plot_bifurcation(parameter= "g")
+    model.plot_phase_space(grid_density=8, t_end=100)
+        
 
