@@ -758,8 +758,9 @@ class Mumby(CoralODELab):
        
         #second derivatives of dM/dt
         MMovergrowthdM = self.p.a * C
-        grazingdM =self.p.g()
+        grazingdM =self.p.g / (1 - C)
         growthdM = self.p.y(1 - C - (2 * M))
+        dMdM = MMovergrowthdM + growthdM - grazingdM
 
         return[dCdC, dMdM]
 
