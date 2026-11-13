@@ -776,7 +776,7 @@ def plot_mumby_fig3_exact(model, g_val=0.3):
     model.set_parameters(g=g_val)
     fig, ax = plt.subplots(figsize=(7, 6))
 
-    # 1. Sample initial conditions strictly within the valid simplex (C + M <= 1)
+    # Sample initial conditions strictly within the valid simplex (C + M <= 1)
     grid = np.linspace(0.05, 0.90, 8)
     t_span = np.linspace(0, 100, 500)
 
@@ -803,10 +803,10 @@ def plot_mumby_fig3_exact(model, g_val=0.3):
                                 xytext=(m_traj[step], c_traj[step]),
                                 arrowprops=dict(arrowstyle="-|>", color='#d9534f', lw=1.2, mutation_scale=10))
 
-    # 2. Draw physical simplex boundary (C + M = 1)
+    # Draw physical simplex boundary (C + M = 1)
     ax.plot([0, 1], [1, 0], 'k--', alpha=0.3, label='Physical Constraint (C+M=1)')
 
-    # 3. Find and plot equilibrium points with paper notation
+    # Find and plot equilibrium points with paper notation
     roots, stability = model.find_eq_points()
     for root, stab in zip(roots, stability):
         c_eq, m_eq = root[0], root[1]
