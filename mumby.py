@@ -6,6 +6,7 @@
 """
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
 from scipy.integrate import odeint
 from scipy.optimize import fsolve
 from itertools import product
@@ -200,7 +201,6 @@ class CoralODELab: # pylint: disable=invalid-name
         and the parameter on the x axis. 
         """
         import matplotlib.pyplot as plt
-        import matplotlib.lines as mlines
         import numpy as np
 
         # If no axis is provided, create a new figure
@@ -758,6 +758,283 @@ class Mumby(CoralODELab):
 
         return np.array([[dCdC, dCdM],
                         [dMdC, dMdM]])
+
+    def _apply_nature_style(self, ax):
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.tick_params(direction="out", length=4, width=0.8, labelsize=9)
+        ax.spines["left"].set_linewidth(0.8)
+        ax.spines["bottom"].set_linewidth(0.8)
+
+    def plot_fig1(
+        self,
+        years,
+        obs_years=None,
+        obs_coral_pct=None,
+        a_values=(0.1, 0.2),
+        save_path=None,
+    ):
+        fig, ax = plt.subplots(figsize=(6.8, 4.4))
+        self._apply_nature_style(ax)
+
+        orig_a = self.p.a
+        self.set_times([int(years[0]), int(years[-1])])
+        for a_val, col in zip(a_values, ["black", "#d62728"]):
+            self.set_parameters(a=a_val)
+            out = self.solve_time()
+            ax.plot(
+                self.times,
+                out[:, 0] * 100.0,
+                color=col,
+                lw=1.3,
+                label=f"Model ($a={a_val}$)",
+            )
+
+        self.set_parameters(a=orig_a)
+
+        if obs_years is not None and obs_coral_pct is not None:
+            ax.plot(
+                obs_years,
+                obs_coral_pct,
+                "s",
+                color="black",
+                markersize=5,
+                label="Empirical data",
+            )
+
+        ax.set_ylim(0, 90)
+        ax.set_xlim(years[0], years[-1])
+        ax.set_xlabel("Year", fontsize=10)
+        ax.set_ylabel("Coral cover (%)", fontsize=10)
+        ax.legend(frameon=False, fontsize=8.5)
+        plt.tight_layout()
+        if save_path:
+            plt.savefig(save_path, dpi=300, bbox_inches="tight")
+        plt.show()
+
+    def plot_fig2(self, a_values=(0.1, 0.2), save_path=None):
+        fig, ax = plt.subplots(figsize=(7.2, 5.2))
+        self._apply_nature_style(ax)
+
+        orig_a, orig_g = self.p.a, self.p.g
+        g_grid = np.linspace(0.05, 0.68, 90)
+        colors = ["black", "#d62728"]
+        sizes = [5.5, 3.3]
+
+        for a_val, col, m_size in zip(a_values, colors, sizes):
+            self.set_parameters(a=a_val)
+            for g in g_grid:
+                self.set_parameters(g=g)
+                roots, types = self.find_eq_points(num_samples=600)
+                for r, t in zip(roots, types):
+                    c_pct = r[0] * 100.0
+                    m_val = r[1]
+                    if c_pct < 0.1 and m_val < 0.05:
+                        continue
+                    is_stable = "Stable" in t
+                    ax.plot(
+                        g,
+                        c_pct,
+                        marker="s",
+                        color=col,
+                        markerfacecolor=col if is_stable else "white",
+                        markersize=m_size,
+                        markeredgewidth=0.9,
+                        linestyle="None",
+                    )
+
+        self.set_parameters(a=orig_a, g=orig_g)
+
+        ax.annotate(
+            "",
+            xy=(0.05, 7),
+            xytext=(0.40, 7),
+            arrowprops=dict(arrowstyle="<->", lw=0.9, color="black"),
+        )
+        ax.text(0.225, 8.5, "Parrotfishes only", ha="center", fontsize=8.5)
+
+        ax.annotate(
+            "",
+            xy=(0.42, 7),
+            xytext=(0.68, 7),
+            arrowprops=dict(arrowstyle="<-", lw=0.9, color="black"),
+        )
+        ax.text(
+            0.55, 8.5, "Parrotfishes and urchins", ha="center", fontsize=8.5
+        )
+
+        handles = [
+            mlines.Line2D(
+                [],
+                [],
+                color="black",
+                marker="s",
+                markerfacecolor="black",
+                linestyle="None",
+                label=f"Stable ($a={a_values[0]}$)",
+            ),
+            mlines.Line2D(
+                [],
+                [],
+                color="black",
+                marker="s",
+                markerfacecolor="white",
+                linestyle="None",
+                label=f"Unstable ($a={a_values[0]}$)",
+            ),
+            mlines.Line2D(
+                [],
+                [],
+                color="#d62728",
+                marker="s",
+                markerfacecolor="#d62728",
+                linestyle="None",
+                label=f"Stable ($a={a_values[1]}$)",
+            ),
+            mlines.Line2D(
+                [],
+                [],
+                color="#d62728",
+                marker="s",
+                markerfacecolor="white",
+                linestyle="None",
+                label=f"Unstable ($a={a_values[1]}$)",
+            ),
+        ]
+        ax.legend(handles=handles, frameon=False, loc="upper left", fontsize=8.5)
+
+        ax.set_xlim(0.03, 0.70)
+        ax.set_ylim(-2, 92)
+        ax.set_xlabel(
+            "Grazing (proportion of reef grazed in 6 months)", fontsize=10
+        )
+        ax.set_ylabel("Coral cover (%)", fontsize=10)
+        plt.tight_layout()
+        if save_path:
+            plt.savefig(save_path, dpi=300, bbox_inches="tight")
+        plt.show()
+
+    def plot_fig3(self, g_values=(0.3, 0.1), save_path=None):
+        fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.6))
+        panel_labels = ["a", "b"]
+        orig_g = self.p.g
+
+        diag_m = np.linspace(0.05, 0.90, 9)
+        starts = [(0.98 - m, m) for m in diag_m] + [
+            (0.02, 0.05),
+            (0.02, 0.15),
+            (0.02, 0.30),
+            (0.15, 0.02),
+            (0.35, 0.02),
+            (0.75, 0.02),
+            (0.30, 0.25),
+            (0.20, 0.35),
+            (0.45, 0.25),
+        ]
+        t_span = np.linspace(0, 120, 600)
+
+        for ax, g_val, panel in zip(axes, g_values, panel_labels):
+            self.set_parameters(g=g_val)
+            self._apply_nature_style(ax)
+
+            for c0, m0 in starts:
+                sol = np.clip(odeint(self.ode, [c0, m0], t_span), 0, 1.0)
+                c_traj, m_traj = sol[:, 0], sol[:, 1]
+
+                ax.plot(m_traj, c_traj, color="#d62728", lw=0.85, zorder=2)
+                ax.plot(m0, c0, "o", color="#d62728", markersize=3.5, zorder=3)
+
+                ds = np.hypot(np.diff(m_traj), np.diff(c_traj))
+                arc_len = np.concatenate([[0], np.cumsum(ds)])
+                if arc_len[-1] > 0.08:
+                    mid_idx = np.searchsorted(arc_len, 0.45 * arc_len[-1])
+                    mid_idx = min(max(mid_idx, 1), len(m_traj) - 2)
+                    ax.annotate(
+                        "",
+                        xy=(m_traj[mid_idx + 1], c_traj[mid_idx + 1]),
+                        xytext=(m_traj[mid_idx], c_traj[mid_idx]),
+                        arrowprops=dict(
+                            arrowstyle="-|>",
+                            color="#d62728",
+                            lw=0.8,
+                            mutation_scale=9,
+                        ),
+                        zorder=3,
+                    )
+
+            roots, stability = self.find_eq_points()
+            for root, stab in zip(roots, stability):
+                c_eq, m_eq = root[0], root[1]
+                is_stable = "Stable" in stab
+
+                if c_eq > 0.3 and m_eq < 0.05:
+                    lbl, offset = (r"$C_s$" if is_stable else r"$C_u$"), (
+                        0.025,
+                        0.0,
+                    )
+                elif m_eq > 0.3 and c_eq < 0.05:
+                    lbl, offset = (r"$M_s$" if is_stable else r"$M_u$"), (
+                        -0.01,
+                        0.03,
+                    )
+                elif c_eq < 0.05 and m_eq < 0.05:
+                    lbl, offset = r"$T_u$", (0.025, 0.02)
+                else:
+                    lbl, offset = r"$CMT_u$", (0.025, 0.015)
+
+                ax.plot(
+                    m_eq,
+                    c_eq,
+                    "o",
+                    color="black",
+                    markerfacecolor="black",
+                    markersize=6.5,
+                    zorder=5,
+                )
+                ax.text(
+                    m_eq + offset[0],
+                    c_eq + offset[1],
+                    lbl,
+                    fontsize=10,
+                    zorder=6,
+                )
+
+            ax.set_xlim(0, 1.0)
+            ax.set_ylim(0, 1.0)
+            ax.set_xticks([0, 0.2, 0.4, 0.6, 0.8, 1.0])
+            ax.set_xticklabels(["0", "0.2", "0.4", "0.6", "0.8", "1"])
+            ax.set_yticks(np.linspace(0, 1.0, 11))
+            ax.set_yticklabels(
+                [
+                    "0",
+                    "0.1",
+                    "0.2",
+                    "0.3",
+                    "0.4",
+                    "0.5",
+                    "0.6",
+                    "0.7",
+                    "0.8",
+                    "0.9",
+                    "1",
+                ]
+            )
+            ax.set_xlabel("Macroalgae", fontsize=10)
+            ax.set_ylabel("Coral cover", fontsize=10)
+            ax.text(
+                -0.12,
+                1.04,
+                panel,
+                transform=ax.transAxes,
+                fontsize=13,
+                fontweight="bold",
+            )
+
+        self.set_parameters(g=orig_g)
+        plt.tight_layout()
+        if save_path:
+            plt.savefig(save_path, dpi=300, bbox_inches="tight")
+        plt.show()
  
 if __name__ == "__main__":
     #set up inital conditions for the bifurcation plot
